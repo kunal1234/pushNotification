@@ -1,12 +1,13 @@
 var push = require('web-push');
- 
+var express = require('express');
+var app = express();
 //var rootCas = require('ssl-root-cas/latest').create();
  
 //rootCas.addFile(__dirname + '/ssl/01-cheap-ssl-intermediary-a.pem').addFile(__dirname + '/ssl/02-cheap-ssl-intermediary-b.pem');
  
 // will work with all https requests will all libraries (i.e. request.js)
 //require('https').globalAgent.options.ca = rootCas;
-
+var port = process.env.PORT || 8080;
 
 
 app.get('/', function (req, res) {
@@ -22,3 +23,6 @@ app.get('/', function (req, res) {
 	res.send('Notification Sent!');
 });
 
+app.listen(port, function() {
+    console.log('Our app is running  ' + port);
+});
