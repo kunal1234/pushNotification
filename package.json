@@ -2,14 +2,18 @@
   "name": "WebPushNotification",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "push.js",
   "scripts": {
+	"start": "node push.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.17.1",
+    "path": "^0.12.7",
+    "ssl-root-cas": "^1.3.1",
     "web-push": "^3.4.3"
   }
 }
