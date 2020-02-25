@@ -7,23 +7,24 @@
 </head>
 <body>
 
-<button onclick="subscribe()">Subscribe Test</button>
+<button onclick="subscribe()">Subscribe</button>
 
 <script>
 	addEventListener('load', async()=> {
 		let sw = await navigator.serviceWorker.register('./sw.js');
-		console.log(sw);
-	})
-	
-	console.log(urlBase64ToUint8Array('BLb6aIeyzqzi58NGwfM5IjDw01bsJEbdQM4jHSjnYs83uEURDKR27Pw4TtlSelvEGzkVdyIMlU3RVd2KVYSAgcg'));
+	});
 	
 	async function subscribe(){
 		let sw = await navigator.serviceWorker.ready;
 		let push = await sw.pushManager.subscribe({
 			userVisibleOnly : true,
 			applicationServerKey: urlBase64ToUint8Array("BLb6aIeyzqzi58NGwfM5IjDw01bsJEbdQM4jHSjnYs83uEURDKR27Pw4TtlSelvEGzkVdyIMlU3RVd2KVYSAgcg")
-		})
-		console.log(JSON.stringify(push))
+		});
+		
+		
+		console.log(JSON.stringify(push));
+		postAjax('http://localhost:8080/subscriber', {userId : JSON.stringify(push), isDinner : true, isTime: false} , function(data){ console.log(data); });
+
 	}
 	
 	function urlBase64ToUint8Array(base64String) {
@@ -39,6 +40,22 @@
 			outputArray[i] = rawData.charCodeAt(i);
 		}
 		return outputArray;
+	}
+	
+	function postAjax(url, data, success) {
+		var params = typeof data == 'string' ? data : Object.keys(data).map(
+				function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
+			).join('&');
+
+		var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+		xhr.open('POST', url);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
+		};
+		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.send(params);
+		return xhr;
 	}
 </script>
 
