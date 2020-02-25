@@ -23,7 +23,7 @@
 		
 		
 		console.log(JSON.stringify(push));
-		postAjax('http://localhost:8080/subscriber', {userId : JSON.stringify(push), isDinner : true, isTime: false} , function(data){ console.log(data); });
+		postAjax(location.origin+'/subscriber', {userId : JSON.stringify(push), isDinner : true, isTime: false} , function(data){ console.log(data); });
 
 	}
 	
