@@ -68,7 +68,9 @@
 			subscribed : true,
 			subscription : JSON.stringify(push),
 			isDinner :{tiffin_dinner:false,fruit_bowl:false},
-			isTime :false
+			isTime :false,
+			dinnerDone:false,
+			timeDone:false
 		}
 		postAjax(location.origin+'/subscriber', 'text/plain', JSON.stringify(subscriberObj), function(data){
 			data = JSON.parse(data);
