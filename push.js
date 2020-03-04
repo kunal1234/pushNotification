@@ -92,7 +92,7 @@ app.get('/send-notification', function (req, res) {
 });
 
 app.get('/reset-subscriber', function (req, res) {
-	sendNotification(pushOptions);
+	resetSubscriber();
 	res.send("All Subscriber has been reset for the day");
 });
 
