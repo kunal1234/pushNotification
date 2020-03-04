@@ -1,34 +1,11 @@
 var pushData;
 self.addEventListener('push', function(e) {
 	pushData = JSON.parse(e.data.text());
-	e.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.options));
+	e.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification));
 });
-
-/*var title = "";
-
-var options = {
-		body: "",
-		vibrate: [100, 50, 100],
-		icon: 'https://lh5.ggpht.com/8J9XJ8SvK0sWknfjDguzTxebgiYbgz-D0L-EG5Lm0-EdmYApN-H4Ewabh-X3nJw4hn0=w300',
-		image: '/dinner.jpg',
-		actions: [
-        {
-          action: 'dinnerYes',
-          title: 'Yes'
-        },
-        {
-          action: 'dinnerNo',
-          title: 'No'
-        }
-      ]
-		
-	}
-*/	
-//registration.showNotification(title, options)
 
 
 self.addEventListener('notificationclick', function(event) {
-	console.log(1)
   event.notification.close();
   if (event.action === 'dinnerYes') {
     orderDinner();
@@ -47,27 +24,7 @@ self.addEventListener('notificationclick', function(event) {
 
 
 function orderDinner(){
-	var title = "What would you like to have in dinner?";
-
-	var options = {
-			body: "",
-			vibrate: [100, 50, 100],
-			icon: 'https://lh5.ggpht.com/8J9XJ8SvK0sWknfjDguzTxebgiYbgz-D0L-EG5Lm0-EdmYApN-H4Ewabh-X3nJw4hn0=w300',
-			image: '/dinner.jpg',
-			actions: [
-			{
-			  action: 'fruitBowl',
-			  title: 'Fruit Bowl'
-			},
-			{
-			  action: 'tiffinDinner',
-			  title: 'Dinner'
-			}
-		  ]
-			
-		}
-		
-	registration.showNotification(title, options);
+	self.registration.showNotification(pushData.titles.title2, pushData.optionsNotification);
 }
 
 function updateUserOrder(orderStatus){
