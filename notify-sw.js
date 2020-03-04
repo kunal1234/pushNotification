@@ -11,13 +11,13 @@ self.addEventListener('notificationclick', function(event) {
     orderDinner();
   }
   if (event.action === 'dinnerNo') {
-	updateUserOrder({"isDinner.tiffin_dinner": false, "isDinner.fruit_bowl": false});
+	updateUserOrder({"isDinner.tiffin_dinner": false, "isDinner.fruit_bowl": false, dinnerDone:true});
   }
   if (event.action === 'fruitBowl') {
-    updateUserOrder({"isDinner.tiffin_dinner": false, "isDinner.fruit_bowl": true});
+    updateUserOrder({"isDinner.tiffin_dinner": false, "isDinner.fruit_bowl": true, dinnerDone:true});
   }
   if (event.action === 'tiffinDinner') {
-    updateUserOrder({"isDinner.tiffin_dinner": true, "isDinner.fruit_bowl": false});
+    updateUserOrder({"isDinner.tiffin_dinner": true, "isDinner.fruit_bowl": false, dinnerDone:true});
   }
 }, false);
 
