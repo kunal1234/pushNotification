@@ -6,25 +6,94 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 </head>
 <body>
-
-<button onclick="subscribe()">Subscribe</button>
+<div id="not-chrome"> Your browser does not support this feature </div>
+<div id="chrome">
+	<form onsubmit="subscription(); return false;" id="subscribe-form">
+	 <input type="email" value="" id="email" name="email" placeholder="Enter your email Id" required />
+	  <button type="submit" id="subscribe">Subscribe</button>
+	</form>
+	<button type="button" id="unsubscribe" onclick="unsubscribe()">Unsubscribe</button>
+</div>
 
 <script>
 	addEventListener('load', async()=> {
-		let sw = await navigator.serviceWorker.register('./sw.js');
+		if (navigator.userAgent.indexOf("Chrome") != -1 ) {
+			let sw = await navigator.serviceWorker.register('./notify-sw.js');
+			document.getElementById('not-chrome').remove();
+			
+			if(localStorage.getItem("subscribe") === "true"){
+				document.getElementById('subscribe-form').remove();
+			}else{
+				document.getElementById('unsubscribe').remove();
+			}
+			
+		} else {
+			document.getElementById('chrome').remove();
+		}
 	});
 	
-	async function subscribe(){
+	function subscription(){
+		var email = document.getElementById('email').value;
+		var subscribeBtn = document.getElementById('subscribe');
+		if(localStorage.getItem("subscribe") === "false" || localStorage.getItem("subscribe") === null || localStorage.getItem("subscribe") === undefined){
+			subscribeBtn.disabled = true;
+			postAjax(location.origin+'/check-user', 'text/plain', email, function(data){ 
+				data = JSON.parse(data);
+				console.log(data);
+				if(data.status === "notAllowed"){
+					alert("This user not allowed for subscription");
+				}
+				if(data.status === true){
+					alert("You are already subscribed !!");
+				}
+				if(data.status === false){
+					subscriber(email);
+				}
+				subscribeBtn.disabled = false;		
+			});
+		}else{
+			alert("This system already subsbcribed with other user");
+		}
+	}
+	
+	async function subscriber(email){
 		let sw = await navigator.serviceWorker.ready;
 		let push = await sw.pushManager.subscribe({
 			userVisibleOnly : true,
 			applicationServerKey: urlBase64ToUint8Array("BLb6aIeyzqzi58NGwfM5IjDw01bsJEbdQM4jHSjnYs83uEURDKR27Pw4TtlSelvEGzkVdyIMlU3RVd2KVYSAgcg")
 		});
 		
-		
-		console.log(JSON.stringify(push));
-		postAjax(location.origin+'/subscriber', {userId : JSON.stringify(push), isDinner : true, isTime: false} , function(data){ console.log(data); });
-
+		var subscriberObj = {
+			"email" : email,
+			subscribed : true,
+			subscription : JSON.stringify(push),
+			isDinner :{tiffin_dinner:false,fruit_bowl:false},
+			isTime :false
+		}
+		postAjax(location.origin+'/subscriber', 'text/plain', JSON.stringify(subscriberObj), function(data){
+			data = JSON.parse(data);
+			if(data.status === "yes"){
+				localStorage.setItem("subscriber", email);
+				localStorage.setItem("subscribe", true);
+				window.location.href = window.location.origin;
+			}
+		});
+	}
+	
+	
+	async function unsubscribe(){
+		var subscriberObj = {
+			"email" : localStorage.getItem("subscriber"),
+			subscribed : false
+		}
+		postAjax(location.origin+'/subscriber', 'text/plain', JSON.stringify(subscriberObj), function(data){
+			data = JSON.parse(data);
+			if(data.status === "yes"){
+				localStorage.removeItem("subscriber");
+				localStorage.removeItem("subscribe");
+				window.location.href = window.location.origin;
+			}
+		});
 	}
 	
 	function urlBase64ToUint8Array(base64String) {
@@ -42,7 +111,7 @@
 		return outputArray;
 	}
 	
-	function postAjax(url, data, success) {
+	function postAjax(url, contentType, data, success) {
 		var params = typeof data == 'string' ? data : Object.keys(data).map(
 				function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
 			).join('&');
@@ -53,7 +122,7 @@
 			if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
 		};
 		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.setRequestHeader('Content-Type', contentType);
 		xhr.send(params);
 		return xhr;
 	}
