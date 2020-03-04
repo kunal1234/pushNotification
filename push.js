@@ -4,8 +4,10 @@ var path = require("path");
 var app = express();
 var bodyParser = require("body-parser");
 var nodemailer = require('nodemailer');
+const cron = require('cron');
 const MongoClient = require('mongodb').MongoClient;
 app.use(express.static('./'))
+
 
 var port = process.env.PORT || 8080;
 
@@ -14,44 +16,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 
-//MongoDB URL
-const uri = "mongodb+srv://admin-user:admin-user@webpushdb-6hegz.gcp.mongodb.net/test?retryWrites=true&w=majority";
 
-//Check User
-app.post('/check-user', function(req, res){
-		(async function() {
-		  var userStatus = await checkUser(req.body);
-		  res.json(userStatus);
-		})();
-});
-
-//Insert New Subscriber
-app.post('/subscriber', function(req, res){
-		(async function() {
-		  var addedUser = await updatedSubscriber(req.body);
-		  res.json(addedUser);
-		})();
-});
-
-app.post('/update-subscriber', function(req, res){
-	console.log(req.body);
-		(async function() {
-		  await updatedSubscriber(JSON.stringify(req.body));
-		  res.json({"status":"yes"});
-		})();
-});
-
-
-app.get('/send-notification', function (req, res) {
-		
-	(async function() {
-		var subscribers = await getAllSubscriber();
-	  
-		var vapidKeys = {
-		  publicKey: 'BLb6aIeyzqzi58NGwfM5IjDw01bsJEbdQM4jHSjnYs83uEURDKR27Pw4TtlSelvEGzkVdyIMlU3RVd2KVYSAgcg',
-		  privateKey: '0DC1Cgn1KN_fC9yHIFO4ePwA-7PpLIn95jfxYv-Fv60'
-		}
-		var pushOptions = {
+//Notification Option
+var pushOptions = {
 			titles : {
 				"title1":"Would you like to have Dinner tonight !!",
 				"title2":"Would you like to order dinner tonight?"
@@ -89,6 +56,63 @@ app.get('/send-notification', function (req, res) {
 				]
 			}			
 		}
+
+
+//MongoDB URL
+const uri = "mongodb+srv://admin-user:admin-user@webpushdb-6hegz.gcp.mongodb.net/test?retryWrites=true&w=majority";
+
+//Check User
+app.post('/check-user', function(req, res){
+		(async function() {
+		  var userStatus = await checkUser(req.body);
+		  res.json(userStatus);
+		})();
+});
+
+//Insert New Subscriber
+app.post('/subscriber', function(req, res){
+		(async function() {
+		  var addedUser = await updatedSubscriber(req.body);
+		  res.json(addedUser);
+		})();
+});
+
+app.post('/update-subscriber', function(req, res){
+	console.log(req.body);
+		(async function() {
+		  await updatedSubscriber(JSON.stringify(req.body));
+		  res.json({"status":"yes"});
+		})();
+});
+
+
+app.get('/send-notification', function (req, res) {
+	sendNotification(pushOptions);
+	res.send("Notification Sent!");
+});
+
+app.get('/',function(req,res){
+  res.sendFile(path.join(__dirname+'/index.html'));
+  //__dirname : It will resolve to your project folder.
+});
+
+
+
+const job = cron.job('* * * * *', () => {
+	sendNotification(pushOptions);
+})
+job.start()
+
+
+
+async function sendNotification(pushOptions) {
+		var subscribers = await getAllSubscriber();
+	  
+		var vapidKeys = {
+		  publicKey: 'BLb6aIeyzqzi58NGwfM5IjDw01bsJEbdQM4jHSjnYs83uEURDKR27Pw4TtlSelvEGzkVdyIMlU3RVd2KVYSAgcg',
+		  privateKey: '0DC1Cgn1KN_fC9yHIFO4ePwA-7PpLIn95jfxYv-Fv60'
+		}
+		
 		push.setVapidDetails('mailto:test@gmail.com', vapidKeys.publicKey, vapidKeys.privateKey);
 
 		for (const subscriber of subscribers) {
@@ -97,15 +121,8 @@ app.get('/send-notification', function (req, res) {
 				push.sendNotification(JSON.parse(subscriber.subscription), pushOptions);	
 			}
 		}
-
-		res.send("Notification Sent!");
-	})();
-});
-
-app.get('/',function(req,res){
-  res.sendFile(path.join(__dirname+'/index.html'));
-  //__dirname : It will resolve to your project folder.
-});
+		console.log("Notification Sent!");
+	}
 
 
 //Check if user already subscribed
@@ -191,7 +208,6 @@ function updatedSubscriber(userObj){
 		});
 	})
 }
-
 
 
 //Send Email for the day
