@@ -91,6 +91,11 @@ app.get('/send-notification', function (req, res) {
 	res.send("Notification Sent!");
 });
 
+app.get('/reset-subscriber', function (req, res) {
+	sendNotification(pushOptions);
+	res.send("All Subscriber has been reset for the day");
+});
+
 app.get('/',function(req,res){
   res.sendFile(path.join(__dirname+'/index.html'));
   //__dirname : It will resolve to your project folder.
@@ -98,13 +103,18 @@ app.get('/',function(req,res){
 
 
 
-const job = cron.job('0 19-21/1 * * 1-5', () => {
+const reminderJob = cron.job('0 19-21/1 * * 1-5', () => {
 	sendNotification(pushOptions);
-})
-job.start()
+});
+reminderJob.start();
+
+const resetJob = cron.job('* 22 * * 1-5', () => {
+	resetSubscriber();
+});
+resetJob.start();
 
 
-
+//Send notification function
 async function sendNotification(pushOptions) {
 		var subscribers = await getAllSubscriber();
 	  
@@ -116,13 +126,14 @@ async function sendNotification(pushOptions) {
 		push.setVapidDetails('mailto:test@gmail.com', vapidKeys.publicKey, vapidKeys.privateKey);
 
 		for (const subscriber of subscribers) {
-			if(subscriber.subscribed){
+			if(subscriber.subscribed && !dinnerDone){
 				pushOptions = JSON.stringify(pushOptions)
 				push.sendNotification(JSON.parse(subscriber.subscription), pushOptions);	
 			}
 		}
 		console.log("Notification Sent!");
 	}
+	
 
 
 //Check if user already subscribed
@@ -177,7 +188,7 @@ function getAllSubscriber(){
 	})
 }
 
-//Get All document from db collection
+//Update one document from db collection
 function updatedSubscriber(userObj){
 	userObj = JSON.parse(userObj);
 	console.log(userObj);
@@ -192,7 +203,7 @@ function updatedSubscriber(userObj){
 			} else {
 				var newvalues = [
 									{ $set: userObj },
-									{ $unset: [ "subscription", "isDinner", "isTime" ] }
+									{ $unset: [ "subscription", "isDinner", "isTime", "dinnerDone", "timeDone" ] }
 								]
 			}
 			databaseCollection.collection("subscriber").updateOne(myquery, newvalues, function(err, res) {
@@ -209,6 +220,25 @@ function updatedSubscriber(userObj){
 	})
 }
 
+
+//Update one document from db collection
+function resetSubscriber(){
+	return new Promise(resolve => {
+		MongoClient.connect(uri,{ useUnifiedTopology: true }, function(err, database) {
+			if (err) throw err;
+			var databaseCollection = database.db("web-push-db");
+			var myquery = { subscribed: true};
+			var newvalues = { $set: {dinnerDone: false} };
+			
+			databaseCollection.collection("subscriber").updateMany(myquery, newvalues, function(err, res) {
+				if (err) throw err;
+				console.log(res.result.nModified + " document(s) updated");
+				resolve({"status":res.result.nModified});				
+				database.close();
+		  });
+		});
+	})
+}
 
 //Send Email for the day
 function sendEmail(){
