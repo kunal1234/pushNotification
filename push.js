@@ -56,25 +56,41 @@ app.get('/send-notification', function (req, res) {
 				"title1":"Would you like to have Dinner tonight !!",
 				"title2":"Would you like to order dinner tonight?"
 			},
-			options : {
+			dinnerNotification : {
 				body: "",
 				vibrate: [100, 50, 100],
 				icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
 				image: 'https://push-notification-web.herokuapp.com/images/dinner.jpg',
 				actions: [
-				{
-				  action: 'dinnerYes',
-				  title: 'Yes'
-				},
-				{
-				  action: 'dinnerNo',
-				  title: 'No'
-				}
-			  ]
-			}
+					{
+					  action: 'dinnerYes',
+					  title: 'Yes'
+					},
+					{
+					  action: 'dinnerNo',
+					  title: 'No'
+					}
+				]
+			},
+			optionsNotification : {
+				body: "",
+				vibrate: [100, 50, 100],
+				icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
+				image: 'https://push-notification-web.herokuapp.com/images/dinner.jpg',
+				actions: [
+					{
+					  action: 'fruitBowl',
+					  title: 'Fruit Bowl'
+					},
+					{
+					  action: 'tiffinDinner',
+					  title: 'Dinner'
+					}
+				]
+			}			
 		}
 		push.setVapidDetails('mailto:test@gmail.com', vapidKeys.publicKey, vapidKeys.privateKey);
-		console.log(subscribers);
+
 		for (const subscriber of subscribers) {
 			if(subscriber.subscribed){
 				pushOptions = JSON.stringify(pushOptions)
