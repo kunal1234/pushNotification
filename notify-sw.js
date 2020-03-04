@@ -1,6 +1,7 @@
+var pushData;
 self.addEventListener('push', function(e) {
-	var pushData = JSON.parse(e.data.text());
-	e.waitUntil(self.registration.showNotification(pushData.titles.title1, options));
+	pushData = JSON.parse(e.data.text());
+	e.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.options));
 });
 
 /*var title = "";
