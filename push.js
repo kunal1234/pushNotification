@@ -56,7 +56,7 @@ app.get('/send-notification', function (req, res) {
 				"title1":"Would you like to have Dinner tonight !!",
 				"title2":"Would you like to order dinner tonight?"
 			},
-			options = {
+			options : {
 				body: "",
 				vibrate: [100, 50, 100],
 				icon: 'https://lh5.ggpht.com/8J9XJ8SvK0sWknfjDguzTxebgiYbgz-D0L-EG5Lm0-EdmYApN-H4Ewabh-X3nJw4hn0=w300',
