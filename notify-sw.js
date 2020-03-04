@@ -77,7 +77,7 @@ app.get('/send-notification', function (req, res) {
 		console.log(subscribers);
 		for (const subscriber of subscribers) {
 			console.log(JSON.parse(subscriber.subscription));
-			push.sendNotification(JSON.parse(subscriber.subscription), pushOptions);
+			push.sendNotification(JSON.parse(subscriber.subscription), JSON.stringify(pushOptions));
 		}
 
 		res.send("Notification Sent!");
