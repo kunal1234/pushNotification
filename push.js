@@ -108,7 +108,7 @@ var reminderJob = new CronJob('0 19-23/1 * * 1-5', function() {
 reminderJob.start();
 
 
-var resetJob = new CronJob('* 22 * * 1-5', function() {
+var resetJob = new CronJob('0 12 * * 1-5', function() {
   resetSubscriber();
 }, null, true, 'Asia/Kolkata');
 resetJob.start();
