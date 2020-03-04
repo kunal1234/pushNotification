@@ -103,7 +103,7 @@ app.get('/',function(req,res){
 
 
 
-const reminderJob = cron.job('0 19-24/1 * * 1-5', () => {
+const reminderJob = cron.job('0 19-23/1 * * 1-5', () => {
 	sendNotification(pushOptions);
 });
 reminderJob.start();
