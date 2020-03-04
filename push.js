@@ -59,8 +59,8 @@ app.get('/send-notification', function (req, res) {
 			options : {
 				body: "",
 				vibrate: [100, 50, 100],
-				icon: 'https://lh5.ggpht.com/8J9XJ8SvK0sWknfjDguzTxebgiYbgz-D0L-EG5Lm0-EdmYApN-H4Ewabh-X3nJw4hn0=w300',
-				image: '/dinner.jpg',
+				icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
+				image: 'https://push-notification-web.herokuapp.com/images/dinner.jpg',
 				actions: [
 				{
 				  action: 'dinnerYes',
