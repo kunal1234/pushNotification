@@ -76,8 +76,8 @@ app.get('/send-notification', function (req, res) {
 		push.setVapidDetails('mailto:test@gmail.com', vapidKeys.publicKey, vapidKeys.privateKey);
 		console.log(subscribers);
 		for (const subscriber of subscribers) {
-			console.log(JSON.parse(subscriber.userId));
-			push.sendNotification(JSON.parse(subscriber.userId), pushOptions);
+			console.log(JSON.parse(subscriber.subscription));
+			push.sendNotification(JSON.parse(subscriber.subscription), JSON.stringify(pushOptions));
 		}
 
 		res.send("Notification Sent!");
