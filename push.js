@@ -98,7 +98,7 @@ app.get('/',function(req,res){
 
 
 
-const job = cron.job('* * * * *', () => {
+const job = cron.job('0 19-21/1 * * 1-5', () => {
 	sendNotification(pushOptions);
 })
 job.start()
