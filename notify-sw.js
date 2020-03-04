@@ -1,11 +1,6 @@
 self.addEventListener('push', function(e) {
-	console.log(e);
-	
-	var options = {
-		body: "This is Body",
-		vibrate: [100, 50, 100]
-	}
-	e.waitUntil(self.registration.showNotification("Test Message 1", options));
+	var pushData = JSON.parse(e.data.text());
+	e.waitUntil(self.registration.showNotification(pushData.titles.title1, options));
 });
 
 /*var title = "";
