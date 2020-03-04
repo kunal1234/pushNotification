@@ -28,7 +28,7 @@ var options = {
 		
 	}
 */	
-registration.showNotification(title, options)
+//registration.showNotification(title, options)
 
 
 self.addEventListener('notificationclick', function(event) {
