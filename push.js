@@ -4,7 +4,7 @@ var path = require("path");
 var app = express();
 var bodyParser = require("body-parser");
 var nodemailer = require('nodemailer');
-const cron = require('cron');
+const CronJob = require('cron').CronJob;
 const MongoClient = require('mongodb').MongoClient;
 app.use(express.static('./'))
 
@@ -102,15 +102,15 @@ app.get('/',function(req,res){
 });
 
 
-
-const reminderJob = cron.job('0 19-23/1 * * 1-5', () => {
-	sendNotification(pushOptions);
-});
+var reminderJob = new CronJob('0 19-23/1 * * 1-5', function() {
+  sendNotification(pushOptions);
+}, null, true, 'Asia/Kolkata');
 reminderJob.start();
 
-const resetJob = cron.job('* 22 * * 1-5', () => {
-	resetSubscriber();
-});
+
+var resetJob = new CronJob('* 22 * * 1-5', function() {
+  resetSubscriber();
+}, null, true, 'Asia/Kolkata');
 resetJob.start();
 
 
