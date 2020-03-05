@@ -28,7 +28,7 @@ function orderDinner(){
 }
 
 function updateUserOrder(orderStatus){
-	orderStatus['email'] = "kunal.bendekar@cgi.com";
+	orderStatus['email'] = pushData.email;
 	fetch(location.origin+'/update-subscriber', {
 		method: 'post',
 		headers: {
