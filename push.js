@@ -95,6 +95,11 @@ app.get('/reset-subscriber', function (req, res) {
 	res.send("All Subscriber has been reset for the day");
 });
 
+app.get('/reset-subscriber', function (req, res) {
+	sendEmailNotification();
+	res.send("All Subscriber has been reset for the day");
+});
+
 app.get('/',function(req,res){
   res.sendFile(path.join(__dirname+'/index.html'));
   //__dirname : It will resolve to your project folder.
@@ -113,7 +118,7 @@ var resetJob = new CronJob('0 12 * * 1-5', function() {
 resetJob.start();
 
 
-var SendEmailConfirmation = new CronJob('46 13 * * 1-5', function() {
+var SendEmailConfirmation = new CronJob('45 16 * * 1-5', function() {
   sendEmailNotification();
 }, null, true, 'Asia/Kolkata');
 SendEmailConfirmation.start();
@@ -312,7 +317,7 @@ async function sendEmailNotification(){
 	  }
 	});
 }
-sendEmailNotification();
+
 
 app.listen(port, function() {
     console.log('Our app is running  ' + port);
