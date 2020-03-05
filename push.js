@@ -101,7 +101,7 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('32 0-23/1 * * 1-5', function() {
+var reminderJob = new CronJob('34 0-23/1 * * 1-5', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
