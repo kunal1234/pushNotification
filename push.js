@@ -101,7 +101,7 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('34 0-23/1 * * 1-5', function() {
+var reminderJob = new CronJob('32 0-23/1 * * 1-5', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
@@ -273,7 +273,7 @@ async function sendEmailNotification(){
 	var tableRow = "<tr><th align='left' bgcolor='#ffff00'>Date: "+date + "-" + month + "-" + year+"</th><th align='left' bgcolor='#ffff00'></th></tr><tr><th align='left' bgcolor='#51e7ff'>Email</th><th align='left' bgcolor='#51e7ff'>Dinner Choice</th></tr>";
 	
 	for (const subscriber of subscribers) {
-		if(subscriber.subscribed){
+		if(subscriber.subscribed && subscriber.dinnerDone){
 			if(subscriber.isDinner.tiffin_dinner){
 				var dinnerChoice = "Dinner";
 			}
@@ -312,7 +312,6 @@ async function sendEmailNotification(){
 	  }
 	});
 }
-sendEmailNotification();
 
 app.listen(port, function() {
     console.log('Our app is running  ' + port);
