@@ -78,7 +78,6 @@ app.post('/subscriber', function(req, res){
 });
 
 app.post('/update-subscriber', function(req, res){
-	console.log(req.body);
 		(async function() {
 		  await updatedSubscriber(JSON.stringify(req.body));
 		  res.json({"status":"yes"});
@@ -102,7 +101,7 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('14 0-23/1 * * 1-5', function() {
+var reminderJob = new CronJob('0 0-23/1 * * 1-5', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
@@ -112,6 +111,12 @@ var resetJob = new CronJob('0 12 * * 1-5', function() {
   resetSubscriber();
 }, null, true, 'Asia/Kolkata');
 resetJob.start();
+
+
+var SendEmailConfirmation = new CronJob('30 16 * * 1-5', function() {
+  sendEmailNotification();
+}, null, true, 'Asia/Kolkata');
+SendEmailConfirmation.start();
 
 
 //Send notification function
@@ -128,8 +133,6 @@ async function sendNotification(pushOptions) {
 		for (const subscriber of subscribers) {
 			if(subscriber.subscribed && !subscriber.dinnerDone){
 				pushOptions = JSON.stringify(pushOptions)
-								console.log(pushOptions);
-				console.log(JSON.parse(subscriber.subscription));
 				push.sendNotification(JSON.parse(subscriber.subscription), pushOptions);	
 			}
 		}
@@ -193,13 +196,11 @@ function getAllSubscriber(){
 //Update one document from db collection
 function updatedSubscriber(userObj){
 	userObj = JSON.parse(userObj);
-	console.log(userObj);
 	return new Promise(resolve => {
 		MongoClient.connect(uri,{ useUnifiedTopology: true }, function(err, database) {
 			if (err) throw err;
 			var databaseCollection = database.db("web-push-db");
 			var myquery = { email: userObj.email};
-			console.log(userObj);
 			if(userObj.subscribed === true || userObj.subscribed === undefined){
 				var newvalues = { $set: userObj };
 			} else {
@@ -242,8 +243,52 @@ function resetSubscriber(){
 	})
 }
 
+// Capitalize String
+function capitalizeFirstLetter(str) {
+    str = str.split(" ");
+    for (var i = 0, x = str.length; i < x; i++) {
+        str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+    return str.join(" ");
+}
+
+
 //Send Email for the day
-function sendEmail(){
+async function sendEmailNotification(){
+	
+	var subscribers = await getAllSubscriber();
+	
+	var date_ob = new Date();
+	
+	// current date
+	// adjust 0 before single digit date
+	var date = ("0" + date_ob.getDate()).slice(-2);
+
+	// current month
+	var month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+	
+	// current year
+	var year = date_ob.getFullYear();
+	
+	var tableRow = "<tr><th align='left' bgcolor='#ffff00'>Date: "+date + "-" + month + "-" + year+"</th><th align='left' bgcolor='#ffff00'></th></tr><tr><th align='left' bgcolor='#51e7ff'>Email</th><th align='left' bgcolor='#51e7ff'>Dinner Choice</th></tr>";
+	
+	for (const subscriber of subscribers) {
+		if(subscriber.subscribed){
+			if(subscriber.isDinner.tiffin_dinner){
+				var dinnerChoice = "Dinner";
+			}
+			if(subscriber.isDinner.fruit_bowl){
+				var dinnerChoice = "Fruit Bowl";
+			}
+			
+			var fullName = subscriber.email;
+			fullName = fullName.split('@')[0].split('.');
+			fullName = fullName[0] +' '+ fullName[ fullName.length-1 ]
+
+			tableRow = tableRow + "<tr><td align='left'>"+capitalizeFirstLetter(fullName)+"</td><td align='left'>"+dinnerChoice+"</td></tr>"
+		}
+	}
+		
 	var transporter = nodemailer.createTransport({
 	  service: 'gmail',
 	  auth: {
@@ -255,24 +300,8 @@ function sendEmail(){
 	var mailOptions = {
 	  from: 'kunal.bendekar@gmail.com',
 	  to: 'kunal.taku@gmail.com',
-	  subject: 'Sending Email using Node.js',
-	  html: `<table style="width:100%">
-			  <tr>
-				<th>Firstname</th>
-				<th>Lastname</th> 
-				<th>Age</th>
-			  </tr>
-			  <tr>
-				<td>Jill</td>
-				<td>Smith</td> 
-				<td>50</td>
-			  </tr>
-			  <tr>
-				<td>Eve</td>
-				<td>Jackson</td> 
-				<td>94</td>
-			  </tr>
-			</table>`
+	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
+	  html: `<table width="400" border="1" cellpadding="5" cellspacing="0">`+tableRow+`</table>`
 	};
 
 	transporter.sendMail(mailOptions, function(error, info){
@@ -283,7 +312,7 @@ function sendEmail(){
 	  }
 	});
 }
-
+sendEmailNotification();
 
 app.listen(port, function() {
     console.log('Our app is running  ' + port);
