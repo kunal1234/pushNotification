@@ -97,7 +97,7 @@ app.get('/reset-subscriber', function (req, res) {
 
 app.get('/send-email', function (req, res) {
 	sendEmailNotification();
-	res.send("All Subscriber has been reset for the day");
+	res.send("Email Sent!!");
 });
 
 app.get('/',function(req,res){
@@ -297,14 +297,14 @@ async function sendEmailNotification(){
 	var transporter = nodemailer.createTransport({
 	  service: 'gmail',
 	  auth: {
-		user: 'kunal.taku@gmail.com',
+		user: 'kunal.bendekar@gmail.com',
 		pass: 'michelin@2020'
 	  }
 	});
 
 	var mailOptions = {
-	  from: 'kunal.taku@gmail.com',
-	  to: 'kunal.bendekar@gmail.com',
+	  from: 'kunal.bendekar@gmail.com',
+	  to: 'kunal.taku@gmail.com',
 	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
 	  html: `<table width="400" border="1" cellpadding="5" cellspacing="0">`+tableRow+`</table>`
 	};
