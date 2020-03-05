@@ -106,7 +106,7 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('30 12-16/1 * * 1-5', function() {
+var reminderJob = new CronJob('0 12-20/1 * * 1-5', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
@@ -137,7 +137,7 @@ async function sendNotification(pushOptions) {
 
 		for (const subscriber of subscribers) {
 			if(subscriber.subscribed && !subscriber.dinnerDone){
-				pushOptions = JSON.stringify(pushOptions)
+				pushOptions = JSON.stringify(pushOptions);
 				push.sendNotification(JSON.parse(subscriber.subscription), pushOptions);	
 			}
 		}
