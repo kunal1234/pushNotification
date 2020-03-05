@@ -138,7 +138,8 @@ async function sendNotification(pushOptions) {
 		for (const subscriber of subscribers) {
 			if(subscriber.subscribed && !subscriber.dinnerDone && subscriber.email === "kunal.bendekar@cgi.com"){
 				var options = JSON.stringify(pushOptions);
-				console.log("test" + options);
+				console.log(typeof(pushOptions));
+				console.log("test" + typeof(options));
 				console.log("test" + JSON.parse(subscriber.subscription));
 				push.sendNotification(JSON.parse(subscriber.subscription), options);	
 			}
