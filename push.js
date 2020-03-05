@@ -27,6 +27,7 @@ var pushOptions = {
 				body: "",
 				icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
 				image: 'https://push-notification-web.herokuapp.com/images/dinner.jpg',
+				vibrate: [200, 100, 200],
 				actions: [
 					{
 					  action: 'dinnerYes',
@@ -42,6 +43,7 @@ var pushOptions = {
 				body: "",
 				icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
 				image: 'https://push-notification-web.herokuapp.com/images/dinner.jpg',
+				vibrate: [200, 100, 200],
 				actions: [
 					{
 					  action: 'fruitBowl',
@@ -104,7 +106,7 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('40 0-23/1 * * 1-5', function() {
+var reminderJob = new CronJob('0 0-23/1 * * 1-5', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
@@ -137,9 +139,6 @@ async function sendNotification(pushOptions) {
 			if(subscriber.subscribed && !subscriber.dinnerDone){
 				pushOptions['email'] = subscriber.email;
 				var options = JSON.stringify(pushOptions);
-				console.log(typeof(pushOptions));
-				console.log("test" + typeof(options));
-				console.log("test" + JSON.parse(subscriber.subscription));
 				push.sendNotification(JSON.parse(subscriber.subscription), options);	
 			}
 		}
