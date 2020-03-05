@@ -25,7 +25,6 @@ var pushOptions = {
 			},
 			dinnerNotification : {
 				body: "",
-				vibrate: [100, 50, 100],
 				icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
 				image: 'https://push-notification-web.herokuapp.com/images/dinner.jpg',
 				actions: [
@@ -41,7 +40,6 @@ var pushOptions = {
 			},
 			optionsNotification : {
 				body: "",
-				vibrate: [100, 50, 100],
 				icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
 				image: 'https://push-notification-web.herokuapp.com/images/dinner.jpg',
 				actions: [
