@@ -128,6 +128,8 @@ async function sendNotification(pushOptions) {
 		for (const subscriber of subscribers) {
 			if(subscriber.subscribed && !subscriber.dinnerDone){
 				pushOptions = JSON.stringify(pushOptions)
+								console.log(pushOptions);
+				console.log(JSON.parse(subscriber.subscription));
 				push.sendNotification(JSON.parse(subscriber.subscription), pushOptions);	
 			}
 		}
