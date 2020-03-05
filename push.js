@@ -101,7 +101,7 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('0 0-23/1 * * 1-5', function() {
+var reminderJob = new CronJob('30 12-16/1 * * 1-5', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
@@ -113,7 +113,7 @@ var resetJob = new CronJob('0 12 * * 1-5', function() {
 resetJob.start();
 
 
-var SendEmailConfirmation = new CronJob('0 0-23/1 * * 1-5', function() {
+var SendEmailConfirmation = new CronJob('46 13 * * 1-5', function() {
   sendEmailNotification();
 }, null, true, 'Asia/Kolkata');
 SendEmailConfirmation.start();
@@ -231,7 +231,7 @@ function resetSubscriber(){
 			if (err) throw err;
 			var databaseCollection = database.db("web-push-db");
 			var myquery = { subscribed: true};
-			var newvalues = { $set: {dinnerDone: false} };
+			var newvalues = { $set: {"isDinner.tiffin_dinner": false, "isDinner.fruit_bowl": false, dinnerDone:false} };
 			
 			databaseCollection.collection("subscriber").updateMany(myquery, newvalues, function(err, res) {
 				if (err) throw err;
@@ -273,7 +273,7 @@ async function sendEmailNotification(){
 	var tableRow = "<tr><th align='left' bgcolor='#ffff00'>Date: "+date + "-" + month + "-" + year+"</th><th align='left' bgcolor='#ffff00'></th></tr><tr><th align='left' bgcolor='#51e7ff'>Email</th><th align='left' bgcolor='#51e7ff'>Dinner Choice</th></tr>";
 	
 	for (const subscriber of subscribers) {
-		if(subscriber.subscribed && subscriber.dinnerDone){
+		if(subscriber.subscribed && (subscriber.isDinner.tiffin_dinner || subscriber.isDinner.fruit_bowl)){
 			if(subscriber.isDinner.tiffin_dinner){
 				var dinnerChoice = "Dinner";
 			}
@@ -292,14 +292,14 @@ async function sendEmailNotification(){
 	var transporter = nodemailer.createTransport({
 	  service: 'gmail',
 	  auth: {
-		user: 'kunal.bendekar@gmail.com',
+		user: 'kunal.taku@gmail.com',
 		pass: 'michelin@2020'
 	  }
 	});
 
 	var mailOptions = {
-	  from: 'kunal.bendekar@gmail.com',
-	  to: 'kunal.taku@gmail.com',
+	  from: 'kunal.taku@gmail.com',
+	  to: 'kunal.bendekar@gmail.com',
 	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
 	  html: `<table width="400" border="1" cellpadding="5" cellspacing="0">`+tableRow+`</table>`
 	};
@@ -312,6 +312,7 @@ async function sendEmailNotification(){
 	  }
 	});
 }
+sendEmailNotification();
 
 app.listen(port, function() {
     console.log('Our app is running  ' + port);
