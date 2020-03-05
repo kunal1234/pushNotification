@@ -134,7 +134,7 @@ async function sendNotification(pushOptions) {
 		push.setVapidDetails('mailto:test@gmail.com', vapidKeys.publicKey, vapidKeys.privateKey);
 
 		for (const subscriber of subscribers) {
-			if(subscriber.subscribed && !subscriber.dinnerDone && subscriber.email === "kunal.bendekar@cgi.com"){
+			if(subscriber.subscribed && !subscriber.dinnerDone){
 				var options = JSON.stringify(pushOptions);
 				console.log(typeof(pushOptions));
 				console.log("test" + typeof(options));
