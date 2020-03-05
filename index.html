@@ -90,7 +90,7 @@
 		}
 		postAjax(location.origin+'/subscriber', 'text/plain', JSON.stringify(subscriberObj), function(data){
 			data = JSON.parse(data);
-			if(data.status === "yes"){
+			if(data){
 				localStorage.removeItem("subscriber");
 				localStorage.removeItem("subscribe");
 				window.location.href = window.location.origin;
