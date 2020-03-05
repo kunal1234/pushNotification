@@ -101,19 +101,19 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('32 0-23/1 * * 1-5', function() {
+var reminderJob = new CronJob('0 0-23/1 * * 1-5', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
 
 
-var resetJob = new CronJob('45 9 * * 1-5', function() {
+var resetJob = new CronJob('0 12 * * 1-5', function() {
   resetSubscriber();
 }, null, true, 'Asia/Kolkata');
 resetJob.start();
 
 
-var SendEmailConfirmation = new CronJob('48 9 * * 1-5', function() {
+var SendEmailConfirmation = new CronJob('0 0-23/1 * * 1-5', function() {
   sendEmailNotification();
 }, null, true, 'Asia/Kolkata');
 SendEmailConfirmation.start();
