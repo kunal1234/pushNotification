@@ -95,7 +95,7 @@ app.get('/reset-subscriber', function (req, res) {
 	res.send("All Subscriber has been reset for the day");
 });
 
-app.get('/reset-subscriber', function (req, res) {
+app.get('/send-email', function (req, res) {
 	sendEmailNotification();
 	res.send("All Subscriber has been reset for the day");
 });
