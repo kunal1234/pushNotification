@@ -276,24 +276,29 @@ async function sendEmailNotification(){
 	// current year
 	var year = date_ob.getFullYear();
 	
-	var tableRow = "<tr><th align='left' bgcolor='#ffff00'>Date: "+date + "-" + month + "-" + year+"</th><th align='left' bgcolor='#ffff00'></th></tr><tr><th align='left' bgcolor='#51e7ff'>Email</th><th align='left' bgcolor='#51e7ff'>Dinner Choice</th></tr>";
+	var tableRow = "<tr><th style='text-align:left;border: 1px solid #555;background: #ffff00;' colspan='2'>Date: "+date + "-" + month + "-" + year+"</th></tr><tr><th style='color: #fff;background: #555555;width: 50%;text-align:left;border: 1px solid #555;'>Email</th><th align='left' bgcolor='#555' style='color: #fff;background: #555555;width: 50%;border: 1px solid #555;'>Dinner Choice</th></tr>"
 	
+	var dinnerCount=0, fruitBowlCount=0;
 	for (const subscriber of subscribers) {
 		if(subscriber.subscribed && (subscriber.isDinner.tiffin_dinner || subscriber.isDinner.fruit_bowl)){
 			if(subscriber.isDinner.tiffin_dinner){
 				var dinnerChoice = "Dinner";
+				dinnerCount++;
 			}
 			if(subscriber.isDinner.fruit_bowl){
 				var dinnerChoice = "Fruit Bowl";
+				fruitBowlCount++;
 			}
 			
 			var fullName = subscriber.email;
 			fullName = fullName.split('@')[0].split('.');
 			fullName = fullName[0] +' '+ fullName[ fullName.length-1 ]
 
-			tableRow = tableRow + "<tr><td align='left'>"+capitalizeFirstLetter(fullName)+"</td><td align='left'>"+dinnerChoice+"</td></tr>"
+			tableRow = tableRow + "<tr><td align='left' style='border: 1px solid #555;'>"+capitalizeFirstLetter(fullName)+"</td><td align='left' style='border: 1px solid #555;'>"+dinnerChoice+"</td></tr>";
 		}
 	}
+	
+	tableRow = tableRow + "<tr><td style='font-weight: bold;text-align:left;'></td><td style='padding: 0;border: 1px solid #555;' bgcolor='#51e7ff;text-align:left;'><table style='width: 100%;border-collapse:collapse;' cellpadding='0' cellspacing='0'><tr><td colspan='2' style='padding: 5px;background: #555;border: 1px solid #555;color: #fff;'><strong>Total</strong></td></tr><tr><td style='padding:5px;background: #80e4fb;border: 1px solid #555;'><strong>Dinner :</strong> "+dinnerCount+"</td><td style='padding:5px;background:#80e4fb;border: 1px solid #555;'><strong>Fruit Bowl :</strong> "+fruitBowlCount+"</td></tr></table></td></tr>";
 		
 	var transporter = nodemailer.createTransport({
 	  service: 'gmail',
@@ -307,7 +312,7 @@ async function sendEmailNotification(){
 	  from: 'kunal.bendekar@gmail.com',
 	  to: 'kunal.taku@gmail.com',
 	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
-	  html: `<table width="400" border="1" cellpadding="5" cellspacing="0">`+tableRow+`</table>`
+	  html: `<table width="400" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">`+tableRow+`</table>`
 	};
 
 	transporter.sendMail(mailOptions, function(error, info){
