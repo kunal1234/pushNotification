@@ -94,8 +94,13 @@ app.post('/subscriber', function(req, res){
 });
 
 app.post('/update-subscriber', function(req, res){
+	if(req.body['isDinner.tiffin_dinner'] === false && req.body['isDinner.fruit_bowl'] === false){
+		(async function() {
+		  await updatedSubscriber(JSON.stringify(req.body));
+		  res.json({"status":"yes"});
+		})();
+	}else{
 		var indiaTime = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
-		
 		const start = 12 * 60 + 30;
 		const end =  16 * 60 + 30;
 		const date = new Date(indiaTime); 
@@ -109,7 +114,7 @@ app.post('/update-subscriber', function(req, res){
 		} else{ 
 			res.json({"status":"expired"});
 		}
-		
+	}
 });
 
 
