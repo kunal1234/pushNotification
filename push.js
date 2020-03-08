@@ -27,7 +27,7 @@ const oauth2Client = new OAuth2(
 );
 
 oauth2Client.setCredentials({
-     refresh_token: "1//04P4RCaLdsohfCgYIARAAGAQSNwF-L9IrpCgbhoH0Dglnt0Jh1g67BjHntGKkgt3zhthZWRrmHShC2yBgkNtKpk0feuBTg1PmAnI"
+     refresh_token: "1//04t_7rY4fUkAkCgYIARAAGAQSNwF-L9IrSQm3Pa_lcsyWh3i1MqIrE8yuseeBPbNI88OL68P2Gdd_sOXV9LOO6gP_GMpSB6VoE4o"
 });
 const accessToken = oauth2Client.getAccessToken();
 
@@ -336,13 +336,13 @@ async function sendEmailNotification(){
           user: "kunal.taku@gmail.com", 
           clientId: "915795085936-st6r8fp29krkse1lcbo46t7vj1d6s2l2.apps.googleusercontent.com",
           clientSecret: "0oEtR6RC8D9-6gneVb1dNPkI",
-          refreshToken: "1//04P4RCaLdsohfCgYIARAAGAQSNwF-L9IrpCgbhoH0Dglnt0Jh1g67BjHntGKkgt3zhthZWRrmHShC2yBgkNtKpk0feuBTg1PmAnI",
+          refreshToken: "1//04t_7rY4fUkAkCgYIARAAGAQSNwF-L9IrSQm3Pa_lcsyWh3i1MqIrE8yuseeBPbNI88OL68P2Gdd_sOXV9LOO6gP_GMpSB6VoE4o",
           accessToken: accessToken
      }
 	});
 
 	var mailOptions = {
-	  from: 'kunal.bendekar@gmail.com',
+	  from: 'kunal.taku@gmail.com',
 	  to: 'kunal.taku@gmail.com',//, vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
 	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
 	  html: `<table width="400" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">`+tableRow+`</table>`
