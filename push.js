@@ -4,6 +4,8 @@ var path = require("path");
 var app = express();
 var bodyParser = require("body-parser");
 var nodemailer = require('nodemailer');
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
 const CronJob = require('cron').CronJob;
 const MongoClient = require('mongodb').MongoClient;
 app.use(express.static('./'))
@@ -15,6 +17,19 @@ var port = process.env.PORT || 8080;
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(bodyParser.text());
+
+
+
+const oauth2Client = new OAuth2(
+     "915795085936-st6r8fp29krkse1lcbo46t7vj1d6s2l2.apps.googleusercontent.com", // ClientID
+     "0oEtR6RC8D9-6gneVb1dNPkI", // Client Secret
+     "https://developers.google.com/oauthplayground" // Redirect URL
+);
+
+oauth2Client.setCredentials({
+     refresh_token: "1//04P4RCaLdsohfCgYIARAAGAQSNwF-L9IrpCgbhoH0Dglnt0Jh1g67BjHntGKkgt3zhthZWRrmHShC2yBgkNtKpk0feuBTg1PmAnI"
+});
+const accessToken = oauth2Client.getAccessToken()
 
 
 //Notification Option
@@ -78,10 +93,22 @@ app.post('/subscriber', function(req, res){
 });
 
 app.post('/update-subscriber', function(req, res){
-		(async function() {
-		  await updatedSubscriber(JSON.stringify(req.body));
-		  res.json({"status":"yes"});
-		})();
+		var indiaTime = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
+		
+		const start = 12 * 60 + 30;
+		const end =  16 * 60 + 30;
+		const date = new Date(indiaTime); 
+		const now = date.getHours() * 60 + date.getMinutes();
+
+		if(start <= now && now <= end){
+			(async function() {
+			  await updatedSubscriber(JSON.stringify(req.body));
+			  res.json({"status":"yes"});
+			})();
+		} else{ 
+			res.json({"status":"expired"});
+		}
+		
 });
 
 
@@ -106,13 +133,13 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('30 12-20/1 * * 1-5', function() {
+var reminderJob = new CronJob('30 12-20/1 * * *', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
 
 
-var resetJob = new CronJob('0 12 * * 1-5', function() {
+var resetJob = new CronJob('0 12 * * *', function() {
   resetSubscriber();
 }, null, true, 'Asia/Kolkata');
 resetJob.start();
@@ -136,7 +163,7 @@ async function sendNotification(pushOptions) {
 		push.setVapidDetails('mailto:test@gmail.com', vapidKeys.publicKey, vapidKeys.privateKey);
 
 		for (const subscriber of subscribers) {
-			if(subscriber.subscribed && !subscriber.dinnerDone){
+			if(subscriber.subscribed && !subscriber.dinnerDone && subscriber.email === "kunal.bendekar@cgi.com"){
 				pushOptions['email'] = subscriber.email;
 				var options = JSON.stringify(pushOptions);
 				push.sendNotification(JSON.parse(subscriber.subscription), options);	
@@ -303,14 +330,18 @@ async function sendEmailNotification(){
 	var transporter = nodemailer.createTransport({
 	  service: 'gmail',
 	  auth: {
-		user: 'kunal.bendekar@gmail.com',
-		pass: 'michelin@2020'
-	  }
+          type: "OAuth2",
+          user: "kunal.taku@gmail.com", 
+          clientId: "915795085936-st6r8fp29krkse1lcbo46t7vj1d6s2l2.apps.googleusercontent.com",
+          clientSecret: "0oEtR6RC8D9-6gneVb1dNPkI",
+          refreshToken: "1//04P4RCaLdsohfCgYIARAAGAQSNwF-L9IrpCgbhoH0Dglnt0Jh1g67BjHntGKkgt3zhthZWRrmHShC2yBgkNtKpk0feuBTg1PmAnI",
+          accessToken: accessToken
+     }
 	});
 
 	var mailOptions = {
 	  from: 'kunal.bendekar@gmail.com',
-	  to: 'kunal.taku@gmail.com, vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
+	  to: 'kunal.taku@gmail.com'//, vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
 	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
 	  html: `<table width="400" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">`+tableRow+`</table>`
 	};

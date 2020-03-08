@@ -40,7 +40,16 @@ function updateUserOrder(orderStatus){
 		return response.json();
 	})
 	.then(function (data) {
-		console.log('Request succeeded with JSON response', data);
+		console.log('Request succeeded with JSON response', data.status);
+
+		if(data.status === "expired"){
+			var dataObj = {
+							body: "",
+							icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
+							vibrate: [200, 100, 200]
+						} 
+			self.registration.showNotification("Sorry, we could not recieved your dinner order request now. Please try to order in between 12:30 pm to 4:30 pm only", dataObj)
+		}
 	})
 	.catch(function(err) {
 		console.log('Fetch Error :-S', err);
