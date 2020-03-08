@@ -341,7 +341,7 @@ async function sendEmailNotification(){
 
 	var mailOptions = {
 	  from: 'kunal.bendekar@gmail.com',
-	  to: 'kunal.taku@gmail.com'//, vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
+	  to: 'kunal.taku@gmail.com',// vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
 	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
 	  html: `<table width="400" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">`+tableRow+`</table>`
 	};
