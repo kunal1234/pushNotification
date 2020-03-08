@@ -19,6 +19,9 @@ self.addEventListener('notificationclick', function(event) {
   if (event.action === 'tiffinDinner') {
     updateUserOrder({"isDinner.tiffin_dinner": true, "isDinner.fruit_bowl": false, dinnerDone:true});
   }
+  if (!event.action) {
+   clients.openWindow(pushData.endpointURL).then(windowClient => windowClient ? windowClient.focus() : null)
+  }
 }, false);
 
 
@@ -27,9 +30,10 @@ function orderDinner(){
 	self.registration.showNotification(pushData.titles.title2, pushData.optionsNotification);
 }
 
+
 function updateUserOrder(orderStatus){
 	orderStatus['email'] = pushData.email;
-	fetch(location.origin+'/update-subscriber', {
+	fetch(pushData.endpointURL+'/update-subscriber', {
 		method: 'post',
 		headers: {
 		  "Content-type": "application/json"
@@ -48,7 +52,7 @@ function updateUserOrder(orderStatus){
 							icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
 							vibrate: [200, 100, 200]
 						} 
-			self.registration.showNotification("Sorry, we could not recieved your dinner order request now. Please try to order in between 12:30 pm to 4:30 pm only", dataObj)
+			self.registration.showNotification("Sorry, we could not receive your dinner order request now. Please try to order in between 12:30 pm to 4:30 pm only", dataObj)
 		}
 	})
 	.catch(function(err) {

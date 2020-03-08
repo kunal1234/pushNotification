@@ -1,0 +1,123 @@
+body {
+    background: #e31937;
+    padding: 0;
+    margin: 0;
+	font-family: 'Pacifico', cursive;
+}
+#chrome.wrapper{
+	max-width: 440px;
+}
+.wrapper{
+    background: #e31937;
+    margin: 0 auto;
+	background: #fff;
+}
+.logo {
+    text-align: center;
+	padding: 25px 25px 10px;
+}
+.heading {
+    color: #e31937;
+    text-align: center;
+    padding: 15px 0;
+	font-size: 30px;
+}
+.order-wrapper .heading{
+	text-align:left;
+	padding: 15px 10px 10px;
+}
+.radio-field label {
+    font-family: 'Raleway', sans-serif;
+    margin-left: 10px;
+    font-weight: 700;
+	cursor: pointer;
+}
+.radio-field {
+    padding:6px 10px;
+    position: relative;
+}
+.radio-field label:before {
+    content: '';
+    background: #fff;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 100%;
+    position: absolute;
+    left: 11px;
+    top: 10px;
+    border: 2px solid #e31937;
+}
+.radio-field input {
+    position: relative;
+    z-index: 1;
+	opacity: 0;
+	cursor: pointer;
+}
+.radio-field input:checked + label:after {
+    background: #e31937;
+    content: '';
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    left: 16px;
+    top: 15px;
+    border-radius: 100%;
+}
+.order-wrapper {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 30px;
+}
+.subscribe-form {
+    padding: 10px 20px 20px;
+}
+.input-field {
+    padding: 10px;
+    text-align: center;
+}
+.input-field input {
+    border: 1px solid #ddd;
+    padding: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 4px;
+    background: #efefef;
+    box-shadow: 2px 2px 1px inset #ddd;
+    color: #555;
+    font-size: 14px;
+}
+.input-field button {
+    background: #e31937;
+    border: 0;
+    padding: 12px 25px;
+    color: #fff;
+    font-size: 14px;
+    width: 100%;
+    text-transform: uppercase;
+	cursor: pointer;
+	font-family: 'Raleway', sans-serif;
+	font-weight:700;
+	outline: 0;
+}
+.overlay-wrapper {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+	display: flex;
+	text-align:center;
+}
+.overlay{
+	background: #e31937;
+	width:100%;
+	height:100%;
+}
+.overlay-wrapper img.loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -100px;
+    margin-top: -100px;
+    width: 200px;
+}

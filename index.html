@@ -5,17 +5,61 @@
 <meta content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" name="viewport"/>
 <meta name="google-site-verification" content="NHOzB95znXK1BY827-7oL_xrON_ReKdKF0pu5OiJtGg" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link href="https://fonts.googleapis.com/css?family=Pacifico|Raleway:500,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="not-chrome"> Your browser does not support this feature </div>
-<div id="chrome">
-	<form onsubmit="subscription(); return false;" id="subscribe-form">
-	 <input type="email" value="" id="email" name="email" placeholder="Enter your email Id" required />
-	  <button type="submit" id="subscribe">Subscribe</button>
-	</form>
-	<button type="button" id="unsubscribe" onclick="unsubscribe()">Unsubscribe</button>
+<div class="logo"><img src="images/icon.png" /></div>
+<div id="not-chrome" class="wrapper">
+<div class="subscribe-form">
+	<div class="heading">Your Browser Does Not Support This Feature
+	</div>
 </div>
-
+</div>
+<div id="chrome" class="wrapper">
+<div class="subscribe-form">
+	<form onsubmit="subscription(); return false;" id="subscribe-form">
+		<div class="heading">Subscribe for Dinner</div>
+		<div class="input-field">
+			<input type="email" value="" id="email" name="email" placeholder="Enter your email Id" required />
+		</div>
+		<div class="input-field">
+			<button type="submit" id="subscribe">Subscribe</button>
+		</div>
+	</form>
+	<div id="unsubscribe">
+		<div class="order-wrapper">
+			<form onsubmit="order(); return false;" id="order-form">
+				<div class="heading">Select dinner option for today</div>
+				<div class="dinner-option">
+					<div class="radio-field">
+						<input type="radio" name="dinner-option" id="fruit_bowl" value="fruit_bowl" required/>
+						<label for="fruit_bowl">Fruit Bowl</label>
+					</div>
+					<div class="radio-field">
+						<input type="radio" name="dinner-option" id="dinner" value="dinner" required/>
+						<label for="dinner">Dinner</label>
+					</div>
+					<div class="input-field" >
+						<button type="submit" >Order</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		
+		<div class="heading">Unsubscribe for Dinner</div>
+		<div class="input-field" >
+			<button type="button" onclick="unsubscribe()">Unsubscribe</button>
+		</div>
+	</div>
+</div>
+</div>
+<div class="overlay-wrapper" id="overlay-wrapper" style="display:none">
+	<div class="overlay">
+		<div class="logo"><img src="images/icon.png" /></div>
+	</div>
+	<img src="images/loader.gif" alt="Loader" class="loader"/>
+</div>
 <script>
 	addEventListener('load', async()=> {
 		if (navigator.userAgent.indexOf("Chrome") != -1 ) {
@@ -38,19 +82,22 @@
 		var subscribeBtn = document.getElementById('subscribe');
 		if(localStorage.getItem("subscribe") === "false" || localStorage.getItem("subscribe") === null || localStorage.getItem("subscribe") === undefined){
 			subscribeBtn.disabled = true;
+			document.getElementById('overlay-wrapper').style.display = "block";
 			postAjax(location.origin+'/check-user', 'text/plain', email, function(data){ 
 				data = JSON.parse(data);
 				console.log(data);
 				if(data.status === "notAllowed"){
+					document.getElementById('overlay-wrapper').style.display = "none";
 					alert("This user not allowed for subscription");
 				}
 				if(data.status === true){
+					document.getElementById('overlay-wrapper').style.display = "none";
 					alert("You are already subscribed !!");
 				}
 				if(data.status === false){
 					subscriber(email);
 				}
-				subscribeBtn.disabled = false;		
+				subscribeBtn.disabled = false;	
 			});
 		}else{
 			alert("This system already subsbcribed with other user");
@@ -73,7 +120,9 @@
 			dinnerDone:false,
 			timeDone:false
 		}
+		
 		postAjax(location.origin+'/subscriber', 'text/plain', JSON.stringify(subscriberObj), function(data){
+			document.getElementById('overlay-wrapper').style.display = "none";
 			data = JSON.parse(data);
 			if(data.status === "yes"){
 				localStorage.setItem("subscriber", email);
@@ -89,13 +138,46 @@
 			"email" : localStorage.getItem("subscriber"),
 			subscribed : false
 		}
+		document.getElementById('overlay-wrapper').style.display = "block";
 		postAjax(location.origin+'/subscriber', 'text/plain', JSON.stringify(subscriberObj), function(data){
+			document.getElementById('overlay-wrapper').style.display = "none";
 			data = JSON.parse(data);
 			if(data){
 				localStorage.removeItem("subscriber");
 				localStorage.removeItem("subscribe");
 				window.location.href = window.location.origin;
 			}
+		});
+	}
+	
+	function order(){
+		var currForm = document.getElementById("order-form");
+		var fruitBowl = false, dinner = false, selectedOption = currForm.elements["dinner-option"].value;
+		if(selectedOption === "fruit_bowl"){
+			fruitBowl = true;
+			dinner = false;
+		}
+		if(selectedOption === "dinner"){
+			fruitBowl = false;
+			dinner = true;
+		}
+		var subscriberObj = {
+			"email" : localStorage.getItem("subscriber"),
+			"isDinner.tiffin_dinner": dinner,
+			"isDinner.fruit_bowl": fruitBowl,
+			"dinnerDone":true
+		}
+		document.getElementById('overlay-wrapper').style.display = "block";
+		postAjax(location.origin+'/update-subscriber', 'application/json', JSON.stringify(subscriberObj), function(data){
+			document.getElementById('overlay-wrapper').style.display = "none";
+			data = JSON.parse(data);
+			if(data.status === "expired"){
+				alert("Sorry, we could not receive your dinner order request now. Please try to order in between 12:30 pm to 4:30 pm only");
+			}
+			if(data.status === "yes"){
+				alert("Your order has been Submitted !!");
+			}
+			document.getElementById(selectedOption).checked = false;
 		});
 	}
 	

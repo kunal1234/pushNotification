@@ -32,8 +32,6 @@ oauth2Client.setCredentials({
 const accessToken = oauth2Client.getAccessToken();
 
 
-console.log("accessToken " + accessToken);
-
 //Notification Option
 var pushOptions = {
 			titles : {
@@ -71,7 +69,8 @@ var pushOptions = {
 					  title: 'Dinner'
 					}
 				]
-			}			
+			},
+			endpointURL : "https://push-notification-web.herokuapp.com"
 		}
 
 
@@ -135,19 +134,19 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('30 12-20/1 * * *', function() {
+var reminderJob = new CronJob('40 12-20/1 * * *', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
 
 
-var resetJob = new CronJob('0 12 * * *', function() {
+var resetJob = new CronJob('44 18 * * *', function() {
   resetSubscriber();
 }, null, true, 'Asia/Kolkata');
 resetJob.start();
 
 
-var SendEmailConfirmation = new CronJob('45 16 * * 1-5', function() {
+var SendEmailConfirmation = new CronJob('42 18 * * *', function() {
   sendEmailNotification();
 }, null, true, 'Asia/Kolkata');
 SendEmailConfirmation.start();
