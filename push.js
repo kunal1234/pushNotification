@@ -134,19 +134,19 @@ app.get('/',function(req,res){
 });
 
 
-var reminderJob = new CronJob('40 12-20/1 * * *', function() {
+var reminderJob = new CronJob('30 12-16/1 * * 1-5', function() {
   sendNotification(pushOptions);
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
 
 
-var resetJob = new CronJob('44 18 * * *', function() {
+var resetJob = new CronJob('0 12 * * *', function() {
   resetSubscriber();
 }, null, true, 'Asia/Kolkata');
 resetJob.start();
 
 
-var SendEmailConfirmation = new CronJob('42 18 * * *', function() {
+var SendEmailConfirmation = new CronJob('45 16 * * 1-5', function() {
   sendEmailNotification();
 }, null, true, 'Asia/Kolkata');
 SendEmailConfirmation.start();
@@ -164,7 +164,7 @@ async function sendNotification(pushOptions) {
 		push.setVapidDetails('mailto:test@gmail.com', vapidKeys.publicKey, vapidKeys.privateKey);
 
 		for (const subscriber of subscribers) {
-			if(subscriber.subscribed && !subscriber.dinnerDone && subscriber.email === "kunal.bendekar@cgi.com"){
+			if(subscriber.subscribed && !subscriber.dinnerDone){
 				pushOptions['email'] = subscriber.email;
 				var options = JSON.stringify(pushOptions);
 				push.sendNotification(JSON.parse(subscriber.subscription), options);	
@@ -342,7 +342,7 @@ async function sendEmailNotification(){
 
 	var mailOptions = {
 	  from: 'kunal.taku@gmail.com',
-	  to: 'kunal.taku@gmail.com',//, vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
+	  to: 'kunal.taku@gmail.com, vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
 	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
 	  html: `<table width="400" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">`+tableRow+`</table>`
 	};
