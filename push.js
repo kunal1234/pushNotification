@@ -29,8 +29,9 @@ const oauth2Client = new OAuth2(
 oauth2Client.setCredentials({
      refresh_token: "1//04P4RCaLdsohfCgYIARAAGAQSNwF-L9IrpCgbhoH0Dglnt0Jh1g67BjHntGKkgt3zhthZWRrmHShC2yBgkNtKpk0feuBTg1PmAnI"
 });
-const accessToken = oauth2Client.getAccessToken()
+const accessToken = oauth2Client.getAccessToken();
 
+console.log("accessToken " + accessToken);
 
 //Notification Option
 var pushOptions = {
@@ -341,7 +342,7 @@ async function sendEmailNotification(){
 
 	var mailOptions = {
 	  from: 'kunal.bendekar@gmail.com',
-	  to: 'kunal.taku@gmail.com',// vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
+	  to: 'kunal.taku@gmail.com',//, vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
 	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
 	  html: `<table width="400" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">`+tableRow+`</table>`
 	};
