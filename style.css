@@ -1,5 +1,5 @@
 body {
-    background: #e31937;
+    background: #fff;
     padding: 0;
     margin: 0;
 	font-family: 'Pacifico', cursive;
@@ -10,14 +10,17 @@ body {
 .wrapper{
     background: #e31937;
     margin: 0 auto;
-	background: #fff;
+
 }
 .logo {
     text-align: center;
-	padding: 25px 25px 10px;
+	padding:50px 25px 30px;
+}
+.logo img {
+    max-width: 220px;
 }
 .heading {
-    color: #e31937;
+    color: #fff;
     text-align: center;
     padding: 15px 0;
 	font-size: 30px;
@@ -31,6 +34,7 @@ body {
     margin-left: 10px;
     font-weight: 700;
 	cursor: pointer;
+	color: #fff;
 }
 .radio-field {
     padding:6px 10px;
@@ -46,7 +50,7 @@ body {
     position: absolute;
     left: 11px;
     top: 10px;
-    border: 2px solid #e31937;
+    border: 2px solid #fff;
 }
 .radio-field input {
     position: relative;
@@ -65,8 +69,8 @@ body {
     border-radius: 100%;
 }
 .order-wrapper {
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 30px;
+    border-bottom: 1px solid #fff;
+    padding-bottom: 20px;
 }
 .subscribe-form {
     padding: 10px 20px 20px;
@@ -76,28 +80,42 @@ body {
     text-align: center;
 }
 .input-field input {
-    border: 1px solid #ddd;
+    border: 2px solid #fff;
     padding: 14px;
     width: 100%;
     box-sizing: border-box;
-    border-radius: 4px;
-    background: #efefef;
-    box-shadow: 2px 2px 1px inset #ddd;
-    color: #555;
-    font-size: 14px;
-}
-.input-field button {
-    background: #e31937;
-    border: 0;
-    padding: 12px 25px;
+    border-radius: 30px;
+    background: rgba(0, 0, 0, 0.2);
     color: #fff;
     font-size: 14px;
+    outline: 0;
+}
+
+::-webkit-input-placeholder { /* Edge */
+  color: #fff;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #fff;
+}
+
+::placeholder {
+  color: #fff;
+}
+.input-field button {
+	background: #fff;
+    border: 0;
+    padding: 14px 25px;
+    color: #e31937;
+    font-size: 18px;
     width: 100%;
     text-transform: uppercase;
-	cursor: pointer;
-	font-family: 'Raleway', sans-serif;
-	font-weight:700;
-	outline: 0;
+    cursor: pointer;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700;
+    outline: 0;
+	border-radius:30px;
+    box-shadow: 3px 3px 1px rgba(0, 0, 0, 0.3);
 }
 .overlay-wrapper {
     position: fixed;
@@ -109,7 +127,7 @@ body {
 	text-align:center;
 }
 .overlay{
-	background: #e31937;
+	background: #fff;
 	width:100%;
 	height:100%;
 }
@@ -117,7 +135,7 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    margin-left: -100px;
-    margin-top: -100px;
-    width: 200px;
+    margin-left: -300px;
+    margin-top: -106px;
+    width: 600px;
 }
