@@ -139,3 +139,6 @@ body {
     margin-top: -106px;
     width: 600px;
 }
+.hide{
+	display:none;
+}
