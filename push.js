@@ -114,12 +114,12 @@ app.post('/update-subscriber', function(req, res){
 		} else{ 
 			res.json({"status":"expired"});
 		}
-	}
+	}		
 });
 
 
-app.get('/send-notification', function (req, res) {
-	sendNotification(pushOptions);
+app.get('/send-notification/:email', function (req, res) {
+	sendNotifications(pushOptions, req.params);
 	res.send("Notification Sent!");
 });
 
@@ -128,8 +128,8 @@ app.get('/reset-subscriber', function (req, res) {
 	res.send("All Subscriber has been reset for the day");
 });
 
-app.get('/send-email', function (req, res) {
-	sendEmailNotification();
+app.get('/send-email/:email', function (req, res) {
+	sendEmailNotification(req.params);
 	res.send("Email Sent!!");
 });
 
@@ -140,7 +140,7 @@ app.get('/',function(req,res){
 
 
 var reminderJob = new CronJob('30 12-16/1 * * 1-5', function() {
-  sendNotification(pushOptions);
+  sendNotifications(pushOptions, {email:"all"});
 }, null, true, 'Asia/Kolkata');
 reminderJob.start();
 
@@ -152,22 +152,22 @@ resetJob.start();
 
 
 var SendEmailConfirmation = new CronJob('45 16 * * 1-5', function() {
-  sendEmailNotification();
+  sendEmailNotification({email:"all"});
 }, null, true, 'Asia/Kolkata');
 SendEmailConfirmation.start();
 
 
 //Send notification function
-async function sendNotification(pushOptions) {
-		var subscribers = await getAllSubscriber();
-	  
-		var vapidKeys = {
-		  publicKey: 'BLb6aIeyzqzi58NGwfM5IjDw01bsJEbdQM4jHSjnYs83uEURDKR27Pw4TtlSelvEGzkVdyIMlU3RVd2KVYSAgcg',
-		  privateKey: '0DC1Cgn1KN_fC9yHIFO4ePwA-7PpLIn95jfxYv-Fv60'
-		}
-		
-		push.setVapidDetails('mailto:test@gmail.com', vapidKeys.publicKey, vapidKeys.privateKey);
-
+async function sendNotifications(pushOptions, user) {
+	var subscribers = await getAllSubscriber();
+  
+	var vapidKeys = {
+	  publicKey: 'BLb6aIeyzqzi58NGwfM5IjDw01bsJEbdQM4jHSjnYs83uEURDKR27Pw4TtlSelvEGzkVdyIMlU3RVd2KVYSAgcg',
+	  privateKey: '0DC1Cgn1KN_fC9yHIFO4ePwA-7PpLIn95jfxYv-Fv60'
+	}
+	
+	push.setVapidDetails('mailto:test@gmail.com', vapidKeys.publicKey, vapidKeys.privateKey);
+	if(user.email === "all"){
 		for (const subscriber of subscribers) {
 			if(subscriber.subscribed && !subscriber.dinnerDone){
 				pushOptions['email'] = subscriber.email;
@@ -175,8 +175,17 @@ async function sendNotification(pushOptions) {
 				push.sendNotification(JSON.parse(subscriber.subscription), options);	
 			}
 		}
-		console.log("Notification Sent!");
+	}else{
+		for (const subscriber of subscribers) {
+			if(subscriber.subscribed && !subscriber.dinnerDone && subscriber.email == user.email){
+				pushOptions['email'] = subscriber.email;
+				var options = JSON.stringify(pushOptions);
+				push.sendNotification(JSON.parse(subscriber.subscription), options);	
+			}
+		}
 	}
+	console.log("Notification Sent!");
+}
 	
 
 
@@ -293,7 +302,7 @@ function capitalizeFirstLetter(str) {
 
 
 //Send Email for the day
-async function sendEmailNotification(){
+async function sendEmailNotification(user){
 	
 	var subscribers = await getAllSubscriber();
 	
@@ -344,10 +353,13 @@ async function sendEmailNotification(){
           accessToken: accessToken
      }
 	});
-
+	
+	if(user.email === "all"){
+		
+	}
 	var mailOptions = {
 	  from: 'kunal.taku@gmail.com',
-	  to: 'kunal.taku@gmail.com, vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com',
+	  to: user.email === "all" ? 'kunal.taku@gmail.com, vishwanathjoshi.qa@gmail.com, sanaullahsayyed@gmail.com' : user.email,
 	  subject: date + "-" + month + "-" + year + ' Dinner confirmation list',
 	  html: `<table width="400" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">`+tableRow+`</table>`
 	};
