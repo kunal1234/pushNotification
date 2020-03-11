@@ -11,12 +11,12 @@
 <body>
 <div class="logo"><img src="images/logo.png" /></div>
 <div id="not-chrome" class="wrapper">
-<div class="subscribe-form">
-	<div class="heading">Your Browser Does Not Support This Feature
+	<div class="subscribe-form">
+		<div class="heading">Your Browser Does Not Support This Feature
+		</div>
 	</div>
 </div>
-</div>
-<div id="chrome" class="wrapper">
+<div id="chrome" class="wrapper hide">
 <div class="subscribe-form">
 	<form onsubmit="subscription(); return false;" id="subscribe-form">
 		<div class="heading">Subscribe for Dinner</div>
@@ -63,6 +63,9 @@
 <script>
 	addEventListener('load', async()=> {
 		if (navigator.userAgent.indexOf("Chrome") != -1 ) {
+			var isChrome = document.getElementById("chrome");
+			isChrome.classList.remove("hide");
+		
 			let sw = await navigator.serviceWorker.register('./notify-sw.js');
 			document.getElementById('not-chrome').remove();
 			
