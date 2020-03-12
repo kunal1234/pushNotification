@@ -53,8 +53,7 @@ var pushOptions = {
 					  title: 'No'
 					}
 				],
-				tag: 'renotify',
-				renotify: true
+				tag: 'renotify'
 			},
 			optionsNotification : {
 				body: "",
