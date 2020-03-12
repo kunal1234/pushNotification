@@ -32,11 +32,6 @@ self.addEventListener('notificationclick', function(event) {
 }, false);
 
 
-self.addEventListener('message', function(messageEvent) {
-  console.log('Handling message event:', messageEvent);
-});
-
-
 function orderDinner(){
 	self.registration.showNotification(pushData.titles.title2, pushData.optionsNotification);
 }
