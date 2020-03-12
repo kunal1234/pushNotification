@@ -39,6 +39,7 @@
 	<img src="images/loader.gif" alt="Loader" class="loader"/>
 </div>
 <script>
+	document.getElementById('overlay-wrapper').style.display = "block";
 	addEventListener('load', async()=> {
 		if (navigator.userAgent.indexOf("Chrome") != -1 && navigator.userAgent.indexOf("Edge") == -1 ) {
 			var isChrome = document.getElementById("chrome");
@@ -51,6 +52,7 @@
 		} else {
 			document.getElementById('chrome').remove();
 		}
+		document.getElementById('overlay-wrapper').style.display = "none";
 	});
 	
 	function updateSubscriptionUser(action){
