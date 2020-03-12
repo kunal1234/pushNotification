@@ -1,12 +1,11 @@
 var pushData;
 self.addEventListener('push', function(e) {
-	var that = e;
 	pushData = JSON.parse(e.data.text());
-	registration.getNotifications(pushData.dinnerNotification).then(function(notifications) {
+	e.waitUntil(registration.getNotifications(pushData.dinnerNotification).then(function(notifications) {
 		if(notifications.length === 0){
-			that.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification));
+			self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification);
 		}
-	});
+	}));
 });
 
 
