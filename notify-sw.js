@@ -2,12 +2,10 @@ var pushData;
 var fired = false;
 self.addEventListener('push', function(e) {
 	pushData = JSON.parse(e.data.text());
-	e.waitUntil(registration.getNotifications(pushData.dinnerNotification).then(function(notifications) {
-		if(notifications.length === 0 && !fired){
-			self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification);
-			fired = true;
-		}
-	}));
+	if(!fired){
+		e.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification));
+		fired = true;
+	}
 });
 
 
