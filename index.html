@@ -62,7 +62,7 @@
 </div>
 <script>
 	addEventListener('load', async()=> {
-		if (navigator.userAgent.indexOf("Chrome") != -1 ) {
+		if (navigator.userAgent.indexOf("Chrome") != -1 && navigator.userAgent.indexOf("Edge") == -1 ) {
 			var isChrome = document.getElementById("chrome");
 			isChrome.classList.remove("hide");
 		

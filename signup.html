@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Web Push Notification</title>
+<meta content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" name="viewport"/>
+<meta name="google-site-verification" content="NHOzB95znXK1BY827-7oL_xrON_ReKdKF0pu5OiJtGg" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link href="https://fonts.googleapis.com/css?family=Pacifico|Raleway:500,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="logo"><img src="images/logo.png" /></div>
+<div id="not-chrome" class="wrapper">
+	<div class="subscribe-form">
+		<div class="heading">Your Browser Does Not Support This Feature
+		</div>
+	</div>
+</div>
+<div id="chrome" class="wrapper hide">
+<div class="subscribe-form">
+	<form onsubmit="updateSubscriptionUser(this.submited); return false;" id="subscribe-form">
+		<div class="heading">Add Or Remove Subscriber</div>
+		<div class="input-field">
+			<input type="email" value="" id="email" name="email" placeholder="Enter email Id" pattern=".+@cgi.com" required />
+		</div>
+		<div class="input-field">
+			<button type="submit" id="addSubscriber" onclick="this.form.submited=this.value;" value="Add">Add Subscriber</button>
+		</div>
+		<div class="input-field">
+			<button type="submit" id="removeSubscriber" onclick="this.form.submited=this.value;" value="Remove">Remove Subscriber</button>
+		</div>
+	</form>
+</div>
+</div>
+<div class="overlay-wrapper" id="overlay-wrapper" style="display:none">
+	<div class="overlay">
+		<div class="logo"><img src="images/logo.png" /></div>
+	</div>
+	<img src="images/loader.gif" alt="Loader" class="loader"/>
+</div>
+<script>
+	addEventListener('load', async()=> {
+		if (navigator.userAgent.indexOf("Chrome") != -1 && navigator.userAgent.indexOf("Edge") == -1 ) {
+			var isChrome = document.getElementById("chrome");
+			isChrome.classList.remove("hide");
+		
+			let sw = await navigator.serviceWorker.register('./notify-sw.js');
+			document.getElementById('not-chrome').remove();
+			
+			
+		} else {
+			document.getElementById('chrome').remove();
+		}
+	});
+	
+	function updateSubscriptionUser(action){
+		var email = document.getElementById('email').value;		
+		
+			document.getElementById('addSubscriber').disabled = true;
+			document.getElementById('removeSubscriber').disabled = true;
+			document.getElementById('overlay-wrapper').style.display = "block";
+			postAjax(location.origin+'/check-user', 'text/plain', email, function(data){ 
+				data = JSON.parse(data);
+				console.log(data);
+				if(action === "Add"){
+					if(data.status === "notAllowed"){
+						addSubscriber(email);
+					}
+					if(data.status === true || data.status === false){
+						alert("This user already added in Subscriber's List");
+						document.getElementById('overlay-wrapper').style.display = "none";
+						document.getElementById('addSubscriber').disabled = false;
+						document.getElementById('removeSubscriber').disabled = false;
+					}
+				}else{
+					if(data.status === "notAllowed"){
+						alert("This user is not available in Subscriber's List");
+						document.getElementById('overlay-wrapper').style.display = "none";
+						document.getElementById('addSubscriber').disabled = false;
+						document.getElementById('removeSubscriber').disabled = false;
+					}
+					if(data.status === true || data.status === false){
+						deleteSubscriber(email);
+					}
+				}				
+			});
+		
+	}
+	
+	function addSubscriber(email){
+		var subscriberObj = {
+			"email" : email,
+			subscribed : false
+		}
+		
+		postAjax(location.origin+'/insert-document', 'text/plain', JSON.stringify(subscriberObj), function(data){
+			document.getElementById('overlay-wrapper').style.display = "none";
+			data = JSON.parse(data);
+			if(data.status === "yes"){
+				alert("This user has been added to Subscriber's List");
+			}else{
+				alert("Unable to add this Subscriber in List");
+			}
+			document.getElementById('addSubscriber').disabled = false;
+			document.getElementById('removeSubscriber').disabled = false;
+		});
+	}
+	
+	function deleteSubscriber(email){
+		var subscriberObj = {
+			"email" : email
+		}
+		
+		postAjax(location.origin+'/delete-document', 'text/plain', JSON.stringify(subscriberObj), function(data){
+			document.getElementById('overlay-wrapper').style.display = "none";
+			data = JSON.parse(data);
+			if(data.status === "yes"){
+				alert("This user has been deleted from Subscriber's List");
+			}else{
+				alert("Unable to delete this Subscriber from List");
+			}
+			document.getElementById('addSubscriber').disabled = false;
+			document.getElementById('removeSubscriber').disabled = false;
+		});
+	}
+	
+	
+	function postAjax(url, contentType, data, success) {
+		var params = typeof data == 'string' ? data : Object.keys(data).map(
+				function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
+			).join('&');
+
+		var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+		xhr.open('POST', url);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
+		};
+		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+		xhr.setRequestHeader('Content-Type', contentType);
+		xhr.send(params);
+		return xhr;
+	}
+</script>
+
+</body>
+</html>

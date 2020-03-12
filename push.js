@@ -89,12 +89,28 @@ app.post('/check-user', function(req, res){
 		})();
 });
 
-//Insert New Subscriber
+//Update New Subscriber
 app.post('/subscriber', function(req, res){
 		(async function() {
 		  var addedUser = await updatedSubscriber(req.body);
 		  res.json(addedUser);
 		})();
+});
+
+//Insert New Subscriber
+app.post('/insert-document', function(req, res){
+	(async function() {
+	  var addedUser = await insertSubscriber(req.body);
+	  res.json(addedUser);
+	})();
+});
+
+//Delete  Subscriber
+app.post('/delete-document', function(req, res){
+	(async function() {
+	  var deleteUser = await deleteSubscriber(req.body);
+	  res.json(deleteUser);
+	})();
 });
 
 app.post('/update-subscriber', function(req, res){
@@ -140,6 +156,18 @@ app.get('/send-email/:email', function (req, res) {
 app.get('/',function(req,res){
   res.sendFile(path.join(__dirname+'/index.html'));
   //__dirname : It will resolve to your project folder.
+});
+
+app.get('/signup',function(req,res){
+  res.sendFile(path.join(__dirname+'/signup.html'));
+  //__dirname : It will resolve to your project folder.
+});
+
+app.get('/all',function(req,res){
+	(async function() {
+		var allUser = await getAllSubscriber();
+		res.send(allUser);
+	})();
 });
 
 
@@ -223,8 +251,24 @@ function insertSubscriber(myobj){
 		  databaseCollection.collection("subscriber").insertOne(JSON.parse(myobj), function(err, res) {
 			if (err) throw err;
 			console.log("1 document inserted");
-			resolve();
+			resolve({"status":"yes"});
 			database.close();
+		  });
+		});
+	});
+};
+
+//Delete document from db collection
+function deleteSubscriber(myobj){
+	return new Promise(resolve => {
+		MongoClient.connect(uri,{ useUnifiedTopology: true }, function(err, database) {
+		  if (err) throw err;
+		  var databaseCollection = database.db("web-push-db");
+		  databaseCollection.collection("subscriber").deleteOne(JSON.parse(myobj), function(err, res) {
+			if (err) throw err;
+				console.log("1 document deleted");
+				resolve({"status":"yes"});
+				database.close();
 		  });
 		});
 	});
