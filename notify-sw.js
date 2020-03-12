@@ -4,9 +4,10 @@ self.addEventListener('push', function(e) {
 	e.waitUntil(registration.getNotifications(pushData.dinnerNotification).then(function(notifications) {
 		if(notifications.length === 0){
 			self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification);
-			notification.close();
+			
 		}
 	}));
+	e.notification.close();
 });
 
 
