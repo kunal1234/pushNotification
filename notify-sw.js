@@ -30,27 +30,6 @@ function orderDinner(){
 	self.registration.showNotification(pushData.titles.title2, pushData.optionsNotification);
 }
 
-var options = {
-				body: "",
-				icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
-				image: 'https://push-notification-web.herokuapp.com/images/dinner.jpg',
-				vibrate: [200, 100, 200],
-				actions: [
-					{
-					  action: 'dinnerYes',
-					  title: 'Yes'
-					},
-					{
-					  action: 'dinnerNo',
-					  title: 'No'
-					}
-				],
-				tag: 'renotify',
-				renotify: true
-			}
-
-self.registration.showNotification("testing", options);
-
 
 function updateUserOrder(orderStatus){
 	orderStatus['email'] = pushData.email;
