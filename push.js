@@ -53,7 +53,8 @@ var pushOptions = {
 					  title: 'No'
 					}
 				],
-				tag: 'renotify'
+				tag: 'renotify',
+				renotify: true
 			},
 			optionsNotification : {
 				body: "",
@@ -70,7 +71,8 @@ var pushOptions = {
 					  title: 'Dinner'
 					}
 				],
-				tag: 'renotifynext'
+				tag: 'renotifynext',
+				renotify: true
 			},
 			endpointURL : "https://push-notification-web.herokuapp.com"
 		}
