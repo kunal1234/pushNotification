@@ -50,8 +50,7 @@ function updateUserOrder(orderStatus){
 							body: "",
 							icon: 'https://push-notification-web.herokuapp.com/images/icon.png',
 							vibrate: [200, 100, 200],
-							tag: 'renotifyagain',
-							renotify: true
+							tag: 'renotifyagain'
 						} 
 			self.registration.showNotification("Sorry, we could not receive your dinner order request now. Please try to order in between 12:30 pm to 4:30 pm only", dataObj)
 		}
