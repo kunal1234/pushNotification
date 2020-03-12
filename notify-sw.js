@@ -1,31 +1,34 @@
 var pushData;
+var fired = false;
 self.addEventListener('push', function(e) {
 	pushData = JSON.parse(e.data.text());
 	e.waitUntil(registration.getNotifications(pushData.dinnerNotification).then(function(notifications) {
-		if(notifications.length === 0){
+		if(notifications.length === 0 && !fired){
 			self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification);
+			fired = true;
 		}
 	}));
 });
 
 
 self.addEventListener('notificationclick', function(event) {
-  event.notification.close();
-  if (event.action === 'dinnerYes') {
-    orderDinner();
-  }
-  if (event.action === 'dinnerNo') {
-	updateUserOrder({"isDinner.tiffin_dinner": false, "isDinner.fruit_bowl": false, dinnerDone:true});
-  }
-  if (event.action === 'fruitBowl') {
-    updateUserOrder({"isDinner.tiffin_dinner": false, "isDinner.fruit_bowl": true, dinnerDone:true});
-  }
-  if (event.action === 'tiffinDinner') {
-    updateUserOrder({"isDinner.tiffin_dinner": true, "isDinner.fruit_bowl": false, dinnerDone:true});
-  }
-  if (!event.action) {
-   clients.openWindow(pushData.endpointURL).then(windowClient => windowClient ? windowClient.focus() : null)
-  }
+	event.notification.close();
+	fired = false;
+	if (event.action === 'dinnerYes') {
+		orderDinner();
+	}
+	if (event.action === 'dinnerNo') {
+		updateUserOrder({"isDinner.tiffin_dinner": false, "isDinner.fruit_bowl": false, dinnerDone:true});
+	}
+	if (event.action === 'fruitBowl') {
+		updateUserOrder({"isDinner.tiffin_dinner": false, "isDinner.fruit_bowl": true, dinnerDone:true});
+	}
+	if (event.action === 'tiffinDinner') {
+		updateUserOrder({"isDinner.tiffin_dinner": true, "isDinner.fruit_bowl": false, dinnerDone:true});
+	}
+	if (!event.action) {
+		clients.openWindow(pushData.endpointURL).then(windowClient => windowClient ? windowClient.focus() : null)
+	}
 }, false);
 
 
