@@ -1,7 +1,7 @@
 var pushData;
 self.addEventListener('push', function(e) {
 	pushData = JSON.parse(e.data.text());
-	registration.getNotifications(options).then(function(notifications) {
+	registration.getNotifications(pushData.dinnerNotification).then(function(notifications) {
 		if(notifications.length === 0){
 			e.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification));
 		}
