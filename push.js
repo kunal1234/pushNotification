@@ -70,8 +70,7 @@ var pushOptions = {
 					  title: 'Dinner'
 					}
 				],
-				tag: 'renotifynext',
-				renotify: true
+				tag: 'renotifynext'
 			},
 			endpointURL : "https://push-notification-web.herokuapp.com"
 		}
