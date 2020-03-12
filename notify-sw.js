@@ -1,17 +1,12 @@
 var pushData;
-var fired = false;
 self.addEventListener('push', function(e) {
 	pushData = JSON.parse(e.data.text());
-	if(!fired){
-		e.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification));
-		fired = true;
-	}
+	e.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification));
 });
 
 
 self.addEventListener('notificationclick', function(event) {
 	event.notification.close();
-	fired = false;
 	if (event.action === 'dinnerYes') {
 		orderDinner();
 	}
