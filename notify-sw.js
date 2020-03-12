@@ -1,7 +1,11 @@
 var pushData;
 self.addEventListener('push', function(e) {
 	pushData = JSON.parse(e.data.text());
-	e.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification));
+	registration.getNotifications(options).then(function(notifications) {
+		if(notifications.length === 0){
+			e.waitUntil(self.registration.showNotification(pushData.titles.title1, pushData.dinnerNotification));
+		}
+	});
 });
 
 
