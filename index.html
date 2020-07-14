@@ -1,228 +1,222 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
- 
+<head>
+<title>Web Push Notification</title>
+<meta content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" name="viewport"/>
+<meta name="google-site-verification" content="NHOzB95znXK1BY827-7oL_xrON_ReKdKF0pu5OiJtGg" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link href="https://fonts.googleapis.com/css?family=Pacifico|Raleway:500,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="logo"><img src="images/logo.png" /></div>
+<div id="not-chrome" class="wrapper">
+	<div class="subscribe-form">
+		<div class="heading">Your Browser Does Not Support This Feature
+		</div>
+	</div>
+</div>
+<div id="chrome" class="wrapper hide">
+<div class="subscribe-form">
+	<form onsubmit="subscription(); return false;" id="subscribe-form">
+		<div class="heading">Subscribe for Dinner</div>
+		<div class="input-field">
+			<input type="email" value="" id="email" name="email" placeholder="Enter your email Id" required />
+		</div>
+		<div class="input-field">
+			<button type="submit" id="subscribe">Subscribe</button>
+		</div>
+	</form>
+	<div id="unsubscribe">
+		<div class="order-wrapper">
+			<form onsubmit="order(); return false;" id="order-form">
+				<div class="heading">Select dinner option for today</div>
+				<div class="dinner-option">
+					<div class="radio-field">
+						<input type="radio" name="dinner-option" id="fruit_bowl" value="fruit_bowl" required/>
+						<label for="fruit_bowl">Fruit Bowl</label>
+					</div>
+					<div class="radio-field">
+						<input type="radio" name="dinner-option" id="dinner" value="dinner" required/>
+						<label for="dinner">Dinner</label>
+					</div>
+					<div class="input-field" >
+						<button type="submit" >Order</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		
+		<div class="heading">Unsubscribe for Dinner</div>
+		<div class="input-field" >
+			<button type="button" onclick="unsubscribe()">Unsubscribe</button>
+		</div>
+	</div>
+</div>
+</div>
+<div class="overlay-wrapper" id="overlay-wrapper" style="display:none">
+	<div class="overlay">
+		<div class="logo"><img src="images/logo.png" /></div>
+	</div>
+	<img src="images/loader.gif" alt="Loader" class="loader"/>
+</div>
+<script>
+	document.getElementById('overlay-wrapper').style.display = "block";
+	addEventListener('load', async()=> {
+		if (navigator.userAgent.indexOf("Chrome") != -1 && navigator.userAgent.indexOf("Edge") == -1 ) {
+			var isChrome = document.getElementById("chrome");
+			isChrome.classList.remove("hide");
+		
+			let sw = await navigator.serviceWorker.register('./notify-sw.js');
+			document.getElementById('not-chrome').remove();
+			
+			if(localStorage.getItem("subscribe") === "true"){
+				document.getElementById('subscribe-form').remove();
+			}else{
+				document.getElementById('unsubscribe').remove();
+			}
+			
+		} else {
+			document.getElementById('chrome').remove();
+		}
+		document.getElementById('overlay-wrapper').style.display = "none";
+	});
 	
-	<script src="./jquery.min.js"></script>
-    <title>O&S Automation</title>
-	<style>
-		.heading1{
-			font-family: arial;
-			font-size: 40px;
-			text-align: center;
-			color: #2875e9;
+	function subscription(){
+		var email = document.getElementById('email').value;
+		var subscribeBtn = document.getElementById('subscribe');
+		if(localStorage.getItem("subscribe") === "false" || localStorage.getItem("subscribe") === null || localStorage.getItem("subscribe") === undefined){
+			subscribeBtn.disabled = true;
+			document.getElementById('overlay-wrapper').style.display = "block";
+			postAjax(location.origin+'/check-user', 'text/plain', email, function(data){ 
+				data = JSON.parse(data);
+				console.log(data);
+				if(data.status === "notAllowed"){
+					document.getElementById('overlay-wrapper').style.display = "none";
+					alert("This user not allowed for subscription");
+				}
+				if(data.status === true){
+					document.getElementById('overlay-wrapper').style.display = "none";
+					alert("You are already subscribed !!");
+				}
+				if(data.status === false){
+					subscriber(email);
+				}
+				subscribeBtn.disabled = false;	
+			});
+		}else{
+			alert("This system already subsbcribed with other user");
+		}
+	}
+	
+	async function subscriber(email){
+		let sw = await navigator.serviceWorker.ready;
+		let push = await sw.pushManager.subscribe({
+			userVisibleOnly : true,
+			applicationServerKey: urlBase64ToUint8Array("BLb6aIeyzqzi58NGwfM5IjDw01bsJEbdQM4jHSjnYs83uEURDKR27Pw4TtlSelvEGzkVdyIMlU3RVd2KVYSAgcg")
+		});
+		
+		var subscriberObj = {
+			"email" : email,
+			subscribed : true,
+			subscription : JSON.stringify(push),
+			isDinner :{tiffin_dinner:false,fruit_bowl:false},
+			isTime :false,
+			dinnerDone:false,
+			timeDone:false
 		}
 		
-		.button{
-			padding: 15px;
-			font-size: 16px;
-			font-weight: bold;
-			border: 1px solid #2875e9;
-			border-radius: 5px;
-			background: #2875e9;
-			color: #fff;
-			margin: 0 auto;
-			width: 50%;
-			display: block;
-		    cursor: pointer;
-		}
-	</style>
-  </head>
-  <body>
-    <h1 class="heading1">O&S Automation</h1>
-    
-	<button id="messsages" class="button" onclick="getMessages()">Check Unread Messages</button>
-
-    <!-- You can also require other files to run in this process -->
-  <script type="text/javascript">
-			  
-		function getMessages(){
-			$.ajax({
-				method: "POST",
-				url: "https://gapi-notification.herokuapp.com/get-messages"
-			}).done(function(result) {
-				console.log(result);
-				if(result.redirect === true){
-					location.href = result.data;
-				}else{
-					var messageData = result.data;
-					if(messageData.resultSizeEstimate > 0){
-						console.log(messageData.messages);
-						checkMessages(messageData.messages);
-					}else{
-						console.log(messageData);
-					}
-				}
-			});
-		}
-
-		function checkMessages(messages){
-			if(messages){
-				var messageIds = [];
-				for(var i=0; i < messages.length; i++){
-					checkEachMessage(messages[i].id);
-					messageIds.push(messages[i].id);
-					if(i === messages.length - 1){
-						modifyMessages(messageIds)
-					}
-				}
+		postAjax(location.origin+'/subscriber', 'text/plain', JSON.stringify(subscriberObj), function(data){
+			document.getElementById('overlay-wrapper').style.display = "none";
+			data = JSON.parse(data);
+			if(data.status === "yes"){
+				localStorage.setItem("subscriber", email);
+				localStorage.setItem("subscribe", true);
+				window.location.href = window.location.origin;
 			}
+		});
+	}
+	
+	
+	async function unsubscribe(){
+		var subscriberObj = {
+			"email" : localStorage.getItem("subscriber"),
+			subscribed : false
 		}
-		
-		function checkEachMessage(messageId){
-			$.ajax({
-				method: "POST",
-				url: "https://gapi-notification.herokuapp.com/check-message",
-				data:{'id': messageId}
-			}).done(function(result) {
-				if(result){
-					var fullMessage = result;
-					result = result.payload.headers;
-					var subject = result.filter(function(data){
-									return data.name === 'Subject';
-								});
-					subject = subject[0].value;
-					console.log(subject);
-					
-					//Outbound SMS
-					var isMatched = subject.includes("You have a new message at CorrLinks");	
-					if(isMatched){
-						var recipient = result.filter(function(data){
-									return data.name === 'To';
-								});
-							recipient = recipient[0].value;
-							recipient = recipient.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi);
-							console.log(recipient);
-							for (var i = 0; i < recipient.length; i++){
-								triggerAutomation(recipient[i]);
-							}
-							
-					}
-					
-					
-					//Inbound SMS
-					var sender = result.filter(function(data){
-									return data.name === 'From';
-								});
-						sender = sender[0].value;
-					var isSmsMatched = sender.includes("@sms.didforsale.com");
-					isSmsMatched = true;
-					if(isSmsMatched){
-						//Get Number from Subject
-						var subjectSMS = subject;
-						var phoneNumber = subjectSMS.match(/(\d+)/);
-						phoneNumber = phoneNumber[0];
-						
-						//Get Message from Body
-						var messageBody = '';
-						if(fullMessage.payload.mimeType === "text/plain"){
-							messageBody = fullMessage.payload.body.data;
-						} else if(fullMessage.payload.parts[0].mimeType === "text/plain"){
-							messageBody = fullMessage.payload.parts[0].body.data;
-						} else if(fullMessage.payload.parts[0].parts[0].mimeType === "text/plain"){
-							messageBody = fullMessage.payload.parts[0].parts[0].body.data;
-						}
-						console.log(messageBody);
-						messageBody = atob(messageBody);
-						messageBody = messageBody.replace('*Message:*', '');
-						console.log(messageBody);
-						triggerSMSAutomation(phoneNumber, messageBody);	
-					}
-				}
-			});
-		}
-
-		async function triggerAutomation(email){
-			var credentials = await getCorrlinksCredentials(email);
-			console.log(credentials);
-			if(credentials.totalSize == 1){
-				window.open("https://www.corrlinks.com/Login.aspx?username="+credentials.records[0].Corrlinks_Username__c+"&password="+credentials.records[0].Corrlinks_Password__c, "_blank");
+		document.getElementById('overlay-wrapper').style.display = "block";
+		postAjax(location.origin+'/subscriber', 'text/plain', JSON.stringify(subscriberObj), function(data){
+			document.getElementById('overlay-wrapper').style.display = "none";
+			data = JSON.parse(data);
+			if(data){
+				localStorage.removeItem("subscriber");
+				localStorage.removeItem("subscribe");
+				window.location.href = window.location.origin;
 			}
-			/*getCredentials.then(async function(credentials){
-				var getUser = await credentials.filter(function(data){
-							return data.email === email;
-						});
-				console.log(getUser.length);
-				if(getUser.length !== 0){
-					window.open("https://www.corrlinks.com/Login.aspx?username="+getUser[0].email+"&password="+getUser[0].password, "_blank");
-				}				
-			});*/
+		});
+	}
+	
+	function order(){
+		var currForm = document.getElementById("order-form");
+		var fruitBowl = false, dinner = false, selectedOption = currForm.elements["dinner-option"].value;
+		if(selectedOption === "fruit_bowl"){
+			fruitBowl = true;
+			dinner = false;
 		}
-		
-		async function triggerSMSAutomation(phoneNumber, messageBody){
-			var inboundMessage = await saveMessage(phoneNumber, messageBody);
-			console.log(inboundMessage);
-		
-			/*getCredentials.then(function(credentials){
-				var getUser = credentials.filter(function(data){
-							return data.phoneNumber === smsNumber;
-						});
-				console.log(getUser.length);
-				if(getUser.length !== 0){
-					window.open("https://www.corrlinks.com/Login.aspx?username="+getUser[0].email+"&password="+getUser[0].password, "_blank");
-				}				
-			});*/
+		if(selectedOption === "dinner"){
+			fruitBowl = false;
+			dinner = true;
 		}
-		
-		function modifyMessages(messagesIds){
-			console.log(messagesIds);
-			$.ajax({
-				method: "POST",
-				url: "https://gapi-notification.herokuapp.com/modify-message",
-				data: {'ids': JSON.stringify(messagesIds)}
-			}).done(function(result) {
-				console.log(result);
-			});
+		var subscriberObj = {
+			"email" : localStorage.getItem("subscriber"),
+			"isDinner.tiffin_dinner": dinner,
+			"isDinner.fruit_bowl": fruitBowl,
+			"dinnerDone":true
 		}
-		
-		
-		
-		
-		
-		//Retrive, Create & Update Salesfore Data
-		
-		var getCredentials = new Promise( function(resolve, reject){
-								var credentials = [
-									{"email":"remmy@osinmatetextingservice.com", "password":"Praiseyah@23"},
-									{"email":"rgordon.aicpa@gmail.com", "password":"Ostexting2@1001"}
-								]
-								resolve(credentials);
-							});
-		
-		
-		function getCorrlinksCredentials(emailId){
-			return new Promise((resolve, reject) => {
-				$.ajax({
-					method: "POST",
-					url: "https://gapi-notification.herokuapp.com/corrlinks-credentials",
-					data:{'email': emailId}
-				}).done(function(result) {
-					console.log(result);
-					resolve(result);
-				});
-			});
+		document.getElementById('overlay-wrapper').style.display = "block";
+		postAjax(location.origin+'/update-subscriber', 'application/json', JSON.stringify(subscriberObj), function(data){
+			document.getElementById('overlay-wrapper').style.display = "none";
+			data = JSON.parse(data);
+			if(data.status === "expired"){
+				alert("Sorry, we could not receive your dinner order request now. Please try to order in between 12:30 pm to 4:30 pm only");
+			}
+			if(data.status === "yes"){
+				alert("Your order has been Submitted !!");
+			}
+			document.getElementById(selectedOption).checked = false;
+		});
+	}
+	
+	function urlBase64ToUint8Array(base64String) {
+		var padding = '='.repeat((4 - base64String.length % 4) % 4);
+		var base64 = (base64String + padding)
+			.replace(/\-/g, '+')
+			.replace(/_/g, '/');
+
+		var rawData = window.atob(base64);
+		var outputArray = new Uint8Array(rawData.length);
+
+		for (var i = 0; i < rawData.length; ++i) {
+			outputArray[i] = rawData.charCodeAt(i);
 		}
-		
-		function saveMessage(phoneNumber, messageBody){
-			return new Promise((resolve, reject) => {
-				$.ajax({
-					method: "POST",
-					url: "https://gapi-notification.herokuapp.com/save-message",
-					data:{'email': emailId, 'message':messageBody}
-				}).done(function(result) {
-					console.log(result);
-					resolve(result);
-				});
-			});
-		}
-		
-		
-		
-		getMessages();
-		setInterval(function(){ 
-			getMessages();
-		}, 60000);
-	  </script>
-  </body>
+		return outputArray;
+	}
+	
+	function postAjax(url, contentType, data, success) {
+		var params = typeof data == 'string' ? data : Object.keys(data).map(
+				function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
+			).join('&');
+
+		var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+		xhr.open('POST', url);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
+		};
+		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+		xhr.setRequestHeader('Content-Type', contentType);
+		xhr.send(params);
+		return xhr;
+	}
+</script>
+
+</body>
 </html>
